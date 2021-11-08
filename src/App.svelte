@@ -1,11 +1,11 @@
 <script>
-  import logo from './assets/svelte.png'
+  import logo from './assets/giphy.gif'
   import Counter from './lib/Counter.svelte'
 </script>
 
 <main>
   <img src={logo} alt="Svelte Logo" />
-  <h1>Hello world!</h1>
+  <h1>Hello world!!!</h1>
 
   <Counter />
 
