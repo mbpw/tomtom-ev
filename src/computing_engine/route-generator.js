@@ -1,5 +1,6 @@
 import ky from 'ky';
 import {car_params, pois_in_city, ev_stations, optimal_route} from './temp_data';
+import {WalkSimulator} from "./walk-simulator";
 
 const endpoint = 'https://api.tomtom.com/routing/1/calculateLongDistanceEVRoute/';
 const vehicleEngineType = 'electric'
@@ -61,20 +62,27 @@ export class RouteGenerator {
         }
     }
 
-    prepareRouteOffer(){
+    async prepareRouteOffer(){
         const route = this.getNextRoute()
         const POIsOnRoute = []
         const firstLeg = route[0] //iterate over all legs later
         const stationName = firstLeg.summary.chargingInformationAtEndOfLeg.chargingParkName //get POI by station name later
-        const proposedPOI = this.selectPOINearStation(stationName)
+        const station = this.evStations.find(element => element.poi.name === stationName);
+        const proposedPOI = await this.selectPOINearStation(station)
         POIsOnRoute.push(proposedPOI)
         return {route:route, POIs: POIsOnRoute}
     }
 
-    selectPOINearStation(stationName){ //POI selection from given station name later
+    async selectPOINearStation(station){ //POI selection from given station later
         const POI = this.POIs.find(element => element.visited === false);
         const index = this.POIs.indexOf(POI)
         this.POIs[index].visited = true
+        const POILocation = [POI.position.lat,POI.position.lon]
+        const stationLocation = [station.position.lat,station.position.lon]
+        const ws = new WalkSimulator(stationLocation,POILocation)
+        const route = await ws.computeWalkRoute()
+
+        POI.route = route
         return POI
     }
 

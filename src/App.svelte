@@ -3,6 +3,7 @@
   import Counter from './lib/Counter.svelte'
   import {RouteGenerator} from './computing_engine/route-generator'
   let result = 'nope';
+  let distance = 0;
   let rg = new RouteGenerator();
 
   async function compute_route() {
@@ -10,10 +11,12 @@
     console.log(route)
   }
 
-  function get_next_poi() {
-    let routeOffer = rg.prepareRouteOffer()
+  async function get_next_poi() {
+    let routeOffer = await rg.prepareRouteOffer()
+    console.log(routeOffer)
     result = routeOffer.POIs[0].poi.name
-    console.log(result)
+    distance = routeOffer.POIs[0].route[0].summary.lengthInMeters
+
   }
 
 </script>
@@ -33,7 +36,7 @@
     </button>
 
     <button on:click={get_next_poi}>
-      Change POI: {result}
+      Change POI: {result} + distance = {distance}
     </button>
 
   </p>
