@@ -1,6 +1,6 @@
 <script>
   import logo from './assets/giphy.gif'
-  import Counter from './lib/Counter.svelte'
+  import Counter from './Components/Counter.svelte'
   import {RouteGenerator} from './computing_engine/route-generator'
   let result = 'nope';
   let rg = new RouteGenerator();
