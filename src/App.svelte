@@ -22,6 +22,7 @@
     let kamil = true;
 
   let ev_stations = [];
+let ev_coords = [];
 
   function pause(milliseconds) {
     var dt = new Date();
@@ -65,6 +66,10 @@
 
   async function showStations() {
     console.log(JSON.stringify(ev_stations));
+    for (let element of ev_stations.results) {
+        ev_coords.push([element.position.lon, element.position.lat])
+    }
+    md.drawEVStationOnMap(ev_coords)
   }
 
   async function displayRoute() {
