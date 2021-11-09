@@ -24,6 +24,8 @@ export class RouteGenerator {
             station.visited = false
         }
         this.optimalRoute = null
+        this.optimalRouteTravelTime = 0
+        this.actualRouteTravelTime = 0
     }
     getEndpointURL(start_x, start_y, stop_x, stop_y, currentCharge){
         return endpoint + start_x+','+start_y+':'+stop_x+','+stop_y+'/json?key='+key+'&vehicleEngineType='+vehicleEngineType+'&constantSpeedConsumptionInkWhPerHundredkm='+this.constantSpeedConsumptionInkWhPerHundredkm+'&currentChargeInkWh='+currentCharge+'&maxChargeInkWh='+this.maxChargeInkWh+'&minChargeAtDestinationInkWh='+this.minChargeAtDestinationInkWh+'&minChargeAtChargingStopsInkWh='+this.minChargeAtChargingStopsInkWh
@@ -39,6 +41,8 @@ export class RouteGenerator {
         let body = {json: car_params}
         let optimalRoute = await this.makeOptimalRouteApiCall(endpointURL, body)
         this.optimalRoute = optimalRoute
+        this.optimalRouteTravelTime = optimalRoute.routes[0].summary.travelTimeInSeconds
+        this.actualRouteTravelTime = this.optimalRouteTravelTime
         return this.optimalRoute
     }
 
@@ -80,7 +84,7 @@ export class RouteGenerator {
             this.optimalRoute.routes[0].summary.lengthInMeters += optimalRouteSecond.routes[0].summary.lengthInMeters
             this.optimalRoute.routes[0].summary.travelTimeInSeconds += optimalRouteSecond.routes[0].summary.travelTimeInSeconds
             this.optimalRoute.routes[0].legs.push(...optimalRouteSecond.routes[0].legs)
-
+            this.actualRouteTravelTime = this.optimalRoute.routes[0].summary.travelTimeInSeconds
             return this.optimalRoute
         }
     }

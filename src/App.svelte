@@ -19,7 +19,7 @@
   let es = new EVSearcher(startPoint, endPoint);
   let ps = new POISearcher('pedestrian', 1800);
 
-    let kamil = true;
+  let kamil = true;
 
   let ev_stations = [];
 
@@ -30,7 +30,10 @@
   async function compute_route() {
       let route = await rg.getNextRoute()
       console.log(route)
-      route_info = route.routes[0].summary.travelTimeInSeconds / 3600
+      const optimalTravelTime = rg.optimalRouteTravelTime
+      const actualTravelTime = rg.actualRouteTravelTime
+
+      route_info =  actualTravelTime === optimalTravelTime ? "optimal" : 100 - actualTravelTime/optimalTravelTime
       let pointsList = []
       let stationsList = []
       for (const leg of route.routes[0].legs) {
@@ -70,6 +73,9 @@
   async function displayRoute() {
     // map here
     return 0
+  }
+  async function clearMap() {
+      md.clearMapDoZera()
   }
 
   async function calculatePolyogns() {
@@ -125,6 +131,9 @@
           <button on:click={displayRoute}>
             Display route on map
           </button>
+            <button on:click={clearMap}>
+                Clear Map
+            </button>
           <button on:click={calculatePolyogns}>
             Calculate polygons
           </button>
