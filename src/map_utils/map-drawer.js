@@ -50,13 +50,34 @@ export class MapDrawer{
         });
     }
 
-    drawEVStationOnMap(coordinates){
+    drawEVStationOnMap(coordinates, removePrevious = true){
+        if (removePrevious){
+            for (const marker of this.EVStations){
+                marker.remove()
+            }
+            this.EVStations = []
+        }
         globalMap.update(map => {
             for (const coordinate of coordinates) {
                 console.log(coordinate)
                 let marker = new tt.Marker().setLngLat(coordinate).setDraggable(false)
                 marker.addTo(map)
+                this.EVStations.push(marker)
         }
             return map
         })}
+
+    clearMapDoZera() {
+
+        for (const marker of this.EVStations) {
+            marker.remove()
+        }
+        this.EVStations = []
+        globalMap.update(map => {
+            console.log(map)
+            if (this.routeLayerId!=='0') {
+                map.removeLayer(this.routeLayerId)
+            }
+        return map})
+    }
 }
