@@ -1,6 +1,6 @@
 import ky from 'ky';
-import {car_params, pois_in_city, ev_stations, optimal_route} from './temp_data';
-import {WalkSimulator} from "./walk-simulator";
+import {car_params} from './temp_data';
+// import {WalkSimulator} from "./walk-simulator";
 
 const endpoint = 'https://api.tomtom.com/routing/1/calculateLongDistanceEVRoute/';
 const vehicleEngineType = 'electric'
@@ -15,11 +15,11 @@ export class RouteGenerator {
         this.minChargeAtDestinationInkWh = minChargeAtDestinationInkWh
         this.minChargeAtChargingStopsInkWh = minChargeAtChargingStopsInkWh
         this.optimalRouteGoodEnough = true
-        this.POIs = pois_in_city.results
+        this.POIs = []//pois_in_city.results
         for (const POI of this.POIs){
             POI.visited = false
         }
-        this.evStations = ev_stations.results
+        this.evStations = [] //ev_stations.results
         for (const station of this.evStations){
             station.visited = false
         }

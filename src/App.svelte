@@ -22,6 +22,7 @@
   let kamil = true;
 
   let ev_stations = [];
+let ev_coords = [];
 
   function pause(milliseconds) {
     var dt = new Date();
@@ -43,7 +44,7 @@
           stationsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
       }
       console.log(stationsList)
-      md.drawRouteOnMap(pointsList)
+      md.drawRouteOnMap(pointsList, true, false)
       md.drawEVStationOnMap(stationsList)
   }
 
@@ -68,6 +69,10 @@
 
   async function showStations() {
     console.log(JSON.stringify(ev_stations));
+    for (let element of ev_stations.results) {
+        ev_coords.push([element.position.lon, element.position.lat])
+    }
+    md.drawEVStationOnMap(ev_coords, false)
   }
 
   async function displayRoute() {
@@ -89,15 +94,19 @@
     // })
 
     for (let element of ev_stations.results) {
-      console.log(element.position)
-      let lat = element.position.lat
-      let lon = element.position.lon
-      let poly = await ps.calculatePolygon(lat, lon)
-      element.rangePolygon = poly
-      pause(200)
-      console.log(poly)
+        // console.log(element.position)
+        let lat = element.position.lat
+        let lon = element.position.lon
+        let poly = await ps.calculatePolygon(lat, lon)
+        element.rangePolygon = poly
+        pause(200)
+        let pois = await ps.computePOIs('tourist,park', poly.reachableRange.boundary)
+        element.pois = pois
+        pause(200)
     }
+
   }
+
 
 </script>
 {#if kamil}
