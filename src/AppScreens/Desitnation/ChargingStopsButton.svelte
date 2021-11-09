@@ -10,7 +10,7 @@
         </slot>
     </div>
         <div class="_img">
-            <img src="./src/assets/icons/arrow_right.png" alt="Choose charging stops"/>
+            <img src="./icons/arrow_right.png" alt="Choose charging stops"/>
         </div>
 </div>
 

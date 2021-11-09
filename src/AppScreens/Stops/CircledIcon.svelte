@@ -1,7 +1,7 @@
 <div class="_parent">
     <div class="_circle">
         <slot name="icon">
-            <img src="./src/assets/icons/dice.png" alt="Random activity"/>
+            <img src="./icons/dice.png" alt="Random activity"/>
         </slot>
     </div>
     <div class="_label">
