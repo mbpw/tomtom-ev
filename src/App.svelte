@@ -12,7 +12,7 @@
   let rg = new RouteGenerator();
   let md = new MapDrawer()
 
-  let kamil = true;
+    let kamil = true;
 
   async function compute_route() {
       let route = await rg.getNextRoute()
@@ -55,33 +55,32 @@
                 Change POI: {result} + distance = {distance}
             </button>
         </p>
-      <Map />
+        <Map/>
     </main>
 {:else}
     <Layout/>
 {/if}
 
 
-
 <style lang="scss">
-  :root {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
+    :root {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
 
-  main {
-    text-align: center;
-    padding: 1em;
-    margin: 0 auto;
-  }
+    main {
+        text-align: center;
+        padding: 1em;
+        margin: 0 auto;
+    }
 
-  h1 {
-    color: $primary;
-    text-transform: uppercase;
-    font-size: 4rem;
-    font-weight: 100;
-    line-height: 1.1;
-    margin: 2rem auto;
-    max-width: 14rem;
-  }
+    h1 {
+        color: $primary;
+        text-transform: uppercase;
+        font-size: 4rem;
+        font-weight: 100;
+        line-height: 1.1;
+        margin: 2rem auto;
+        max-width: 14rem;
+    }
 </style>
