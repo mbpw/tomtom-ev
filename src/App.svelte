@@ -1,6 +1,8 @@
 <script>
   import logo from './assets/giphy.gif'
   import Counter from './Components/Counter.svelte'
+  import Map from './Components/Map.svelte'
+  import {globalMap} from "./store";
   import {RouteGenerator} from './computing_engine/route-generator'
   let route_info = 'not computed'
   let result = 'nope';
@@ -11,7 +13,6 @@
     let route = await rg.getNextRoute()
     console.log(route)
     route_info=route.routes[0].summary.travelTimeInSeconds/3600
-
   }
 
   async function get_next_poi() {
@@ -29,10 +30,12 @@
   <h1>Hello world!!!</h1>
 
   <Counter />
+
   <p>
     Visit <a href="https://svelte.dev">svelte.dev</a> to learn how to build Svelte
     apps.
   </p>
+
   <p>
     <button on:click={compute_route}>
       Compute next optimal route!, time (h) = {route_info}
@@ -43,6 +46,7 @@
     </button>
 
   </p>
+  <Map />
   <p>
     Check out <a href="https://github.com/sveltejs/kit#readme">SvelteKit</a> for
     the officially supported framework, also powered by Vite!
