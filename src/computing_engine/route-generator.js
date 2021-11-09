@@ -1,10 +1,11 @@
 import ky from 'ky';
+import {car_params, pois_in_city, ev_stations, optimal_route} from './temp_data';
 
 const endpoint = 'https://api.tomtom.com/routing/1/calculateLongDistanceEVRoute/';
 const vehicleEngineType = 'electric'
 const key = 'KSiA3cYn3i5bjlooe5NlxW5tR5uF0t7P';
 export class RouteGenerator {
-    constructor(startPoint = [52,21], endPoint = [49,20], constantSpeedConsumptionInkWhPerHundredkm ="32,10.87:77,18.01", currentChargeInkWh=20, maxChargeInkWh=40, minChargeAtDestinationInkWh=4,minChargeAtChargingStopsInkWh=4) {
+    constructor(startPoint = [52,21], endPoint = [49,20], constantSpeedConsumptionInkWhPerHundredkm ="32,10.87:77,18.01", currentChargeInkWh=20, maxChargeInkWh=40, minChargeAtDestinationInkWh=4,minChargeAtChargingStopsInkWh=4, POIs = null, evStations = null) {
         this.startPoint = startPoint
         this.endPoint = endPoint
         this.constantSpeedConsumptionInkWhPerHundredkm = constantSpeedConsumptionInkWhPerHundredkm
@@ -12,6 +13,13 @@ export class RouteGenerator {
         this.maxChargeInkWh = maxChargeInkWh
         this.minChargeAtDestinationInkWh = minChargeAtDestinationInkWh
         this.minChargeAtChargingStopsInkWh = minChargeAtChargingStopsInkWh
+        this.optimalRouteGoodEnough = true
+        this.POIs = pois_in_city.results
+        for (const POI of this.POIs){
+            POI.visited = false
+        }
+        this.evStations = ev_stations.results
+        this.optimalRoute = null
     }
     getEndpointURL(){
         return endpoint + this.startPoint[0]+','+this.startPoint[1]+':'+this.endPoint[0]+','+this.endPoint[1]+'/json?key='+key+'&vehicleEngineType='+vehicleEngineType+'&constantSpeedConsumptionInkWhPerHundredkm='+this.constantSpeedConsumptionInkWhPerHundredkm+'&currentChargeInkWh='+this.currentChargeInkWh+'&maxChargeInkWh='+this.maxChargeInkWh+'&minChargeAtDestinationInkWh='+this.minChargeAtDestinationInkWh+'&minChargeAtChargingStopsInkWh='+this.minChargeAtChargingStopsInkWh
@@ -23,68 +31,51 @@ export class RouteGenerator {
     }
 
     computeOptimalRoute(){
-        let enpointURL = this.getEndpointURL()
-        let body = {json: {
-                            "chargingParameters": {
-                              "batteryCurve": [
-                                {
-                                  "stateOfChargeInkWh": 50.0,
-                                  "maxPowerInkW": 200
-                                },
-                                {
-                                  "stateOfChargeInkWh": 70.0,
-                                  "maxPowerInkW": 100
-                                },
-                                {
-                                  "stateOfChargeInkWh": 80.0,
-                                  "maxPowerInkW": 40
-                                }
-                              ],
-                              "chargingConnectors": [
-                                {
-                                  "currentType": "AC3",
-                                  "plugTypes": [
-                                    "IEC_62196_Type_2_Outlet",
-                                    "IEC_62196_Type_2_Connector_Cable_Attached",
-                                    "Combo_to_IEC_62196_Type_2_Base"
-                                  ],
-                                  "efficiency": 0.9,
-                                  "baseLoadInkW": 0.2,
-                                  "maxPowerInkW": 11
-                                },
-                                {
-                                  "currentType": "DC",
-                                  "plugTypes": [
-                                    "IEC_62196_Type_2_Outlet",
-                                    "IEC_62196_Type_2_Connector_Cable_Attached",
-                                    "Combo_to_IEC_62196_Type_2_Base"
-                                  ],
-                                  "voltageRange": {
-                                    "minVoltageInV": 0,
-                                    "maxVoltageInV": 500
-                                  },
-                                  "efficiency": 0.9,
-                                  "baseLoadInkW": 0.2,
-                                  "maxPowerInkW": 150
-                                },
-                                {
-                                  "currentType": "DC",
-                                  "plugTypes": [
-                                    "IEC_62196_Type_2_Outlet",
-                                    "IEC_62196_Type_2_Connector_Cable_Attached",
-                                    "Combo_to_IEC_62196_Type_2_Base"
-                                  ],
-                                  "voltageRange": {
-                                    "minVoltageInV": 500,
-                                    "maxVoltageInV": 2000
-                                  },
-                                  "efficiency": 0.9,
-                                  "baseLoadInkW": 0.2
-                                }
-                              ],
-                              "chargingTimeOffsetInSec": 60
-                          }}};
-        return this.makeOptimalRouteApiCall(enpointURL, body)
+        // let endpointURL = this.getEndpointURL()
+        // let body = {json: car_params}
+        // this.optimalRoute = this.makeOptimalRouteApiCall(endpointURL, body)
+        this.optimalRoute = optimal_route.routes[0].legs
+        console.log(this.optimalRoute.length)
+        return this.optimalRoute
+    }
+
+    getPointsOfOptimalRoute(){
+        if (this.optimalRoute == null){
+            this.computeOptimalRoute()
+        }
+        const points = []
+        for (const leg of this.optimalRoute){
+            points.push(...leg.points)
+        }
+        console.log(points)
+        return points
+    }
+
+    getNextRoute(){
+        if (this.optimalRouteGoodEnough) {
+            return this.optimalRoute
+        }
+        else
+        {
+            //not implemented
+        }
+    }
+
+    prepareRouteOffer(){
+        const route = this.getNextRoute()
+        const POIsOnRoute = []
+        const firstLeg = route[0] //iterate over all legs later
+        const stationName = firstLeg.summary.chargingInformationAtEndOfLeg.chargingParkName //get POI by station name later
+        const proposedPOI = this.selectPOINearStation(stationName)
+        POIsOnRoute.push(proposedPOI)
+        return {route:route, POIs: POIsOnRoute}
+    }
+
+    selectPOINearStation(stationName){ //POI selection from given station name later
+        const POI = this.POIs.find(element => element.visited === false);
+        const index = this.POIs.indexOf(POI)
+        this.POIs[index].visited = true
+        return POI
     }
 
 }

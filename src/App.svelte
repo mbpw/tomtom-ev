@@ -3,9 +3,16 @@
   import Counter from './lib/Counter.svelte'
   import {RouteGenerator} from './computing_engine/route-generator'
   let result = 'nope';
-  async function test_api_ask() {
-    let rg = new RouteGenerator()
-    let result = await rg.computeOptimalRoute()
+  let rg = new RouteGenerator();
+
+  async function compute_route() {
+    let route = await rg.computeOptimalRoute()
+    console.log(route)
+  }
+
+  function get_next_poi() {
+    let routeOffer = rg.prepareRouteOffer()
+    result = routeOffer.POIs[0].poi.name
     console.log(result)
   }
 
@@ -21,8 +28,12 @@
     apps.
   </p>
   <p>
-    <button on:click={test_api_ask}>
-      response: {result}
+    <button on:click={compute_route}>
+      Compute optimal route!
+    </button>
+
+    <button on:click={get_next_poi}>
+      Change POI: {result}
     </button>
 
   </p>
