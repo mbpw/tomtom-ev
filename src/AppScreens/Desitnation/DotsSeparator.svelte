@@ -1,9 +1,11 @@
 <script>
+    import {slide} from 'svelte/transition';
+
     export let quantity = 3;
 </script>
 
 {#each Array(quantity) as _, i}
-    <div>
+    <div in:slide>
 
     </div>
 {/each}
