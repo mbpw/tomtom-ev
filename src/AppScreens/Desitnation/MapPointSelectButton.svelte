@@ -10,7 +10,7 @@
     </div>
     {#if gps}
         <div class="_img">
-            <img src="./icons/gps.png" alt="gps"/>
+            <img src="./icons/gps.svg" alt="gps"/>
         </div>
     {/if}
 </div>

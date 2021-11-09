@@ -10,7 +10,7 @@
     const { open } = getContext('simple-modal');
 
     const showSurprise = () => {
-        open(CategorySelectorModal, { message: "It's a modal!" });
+        open(CategorySelectorModal, { slot: 0 });
     };
 </script>
 

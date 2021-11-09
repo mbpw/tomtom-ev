@@ -1,7 +1,7 @@
-<div class="_parent">
+<div class="_parent" on:click>
     <div class="_circle">
         <slot name="icon">
-            <img src="./icons/dice.png" alt="Random activity"/>
+            <img src="./icons/dice.svg" alt="Random activity"/>
         </slot>
     </div>
     <div class="_label">
