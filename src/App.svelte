@@ -3,11 +3,14 @@
   import Map from './Components/Map.svelte'
   import {globalMap} from "./store";
   import {RouteGenerator} from './computing_engine/route-generator'
+  import {MapDrawer} from "./map_utils/map-drawer";
   import Layout from "./Layout.svelte";
   let route_info = 'not computed'
   let result = 'nope';
   let distance = 0;
+  let routeLayerId = '0'
   let rg = new RouteGenerator();
+  let md = new MapDrawer()
 
   let kamil = true;
 
@@ -15,6 +18,17 @@
       let route = await rg.getNextRoute()
       console.log(route)
       route_info = route.routes[0].summary.travelTimeInSeconds / 3600
+      let pointsList = []
+      let stationsList = []
+      for (const leg of route.routes[0].legs) {
+          for (const point of leg.points) {
+              pointsList.push([point.longitude, point.latitude])
+          }
+          stationsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
+      }
+      console.log(stationsList)
+      md.drawRouteOnMap(pointsList)
+      md.drawEVStationOnMap(stationsList)
   }
 
     async function get_next_poi() {

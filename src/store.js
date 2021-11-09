@@ -1,3 +1,3 @@
 import { writable } from 'svelte/store';
 
-export const globalMap = writable(0);
+export const globalMap = writable(null);

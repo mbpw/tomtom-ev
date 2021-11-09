@@ -1,5 +1,6 @@
 <script>
 import tt from "@tomtom-international/web-sdk-maps";
+import '@tomtom-international/web-sdk-maps/dist/maps.css'
 import {globalMap} from "../store";
 import { onMount } from "svelte";
 let map
@@ -15,17 +16,18 @@ onMount(() => {
         center: [21, 52],
         zoom: 5
     });
+    globalMap.set(map)
 });
-globalMap.subscribe(value => {
-    map = value;
-});
+
+
 </script>
 
 <div class="map" bind:this={mapElement}></div>
 
 <style>
     .map {
-        height: 60%;
+        width:100%;
+        height:400px
     }
     button {
         margin-top: 2rem;
