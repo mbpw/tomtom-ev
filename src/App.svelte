@@ -2,18 +2,24 @@
   import logo from './assets/giphy.gif'
   import Counter from './Components/Counter.svelte'
   import {RouteGenerator} from './computing_engine/route-generator'
+  let route_info = 'not computed'
   let result = 'nope';
+  let distance = 0;
   let rg = new RouteGenerator();
 
   async function compute_route() {
-    let route = await rg.computeOptimalRoute()
+    let route = await rg.getNextRoute()
     console.log(route)
+    route_info=route.routes[0].summary.travelTimeInSeconds/3600
+
   }
 
-  function get_next_poi() {
-    let routeOffer = rg.prepareRouteOffer()
+  async function get_next_poi() {
+    let routeOffer = await rg.prepareRouteOffer()
+    console.log(routeOffer)
     result = routeOffer.POIs[0].poi.name
-    console.log(result)
+    distance = routeOffer.POIs[0].route[0].summary.lengthInMeters
+
   }
 
 </script>
@@ -29,11 +35,11 @@
   </p>
   <p>
     <button on:click={compute_route}>
-      Compute optimal route!
+      Compute next optimal route!, time (h) = {route_info}
     </button>
 
     <button on:click={get_next_poi}>
-      Change POI: {result}
+      Change POI: {result} + distance = {distance}
     </button>
 
   </p>
