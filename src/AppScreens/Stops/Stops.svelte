@@ -3,7 +3,17 @@
     import Button from "../../Components/Button.svelte";
     import GrayButton from "./GrayButton.svelte";
     import {openedScreen} from "../../stores/appState";
+
+    import { getContext } from 'svelte';
+    import CategorySelectorModal from "./CategorySelectorModal.svelte";
+
+    const { open } = getContext('simple-modal');
+
+    const showSurprise = () => {
+        open(CategorySelectorModal, { message: "It's a modal!" });
+    };
 </script>
+
 
 <div class="_parent">
 
@@ -11,9 +21,10 @@
         Choose your <br> charging stops
     </Header>
 
-    <div class="categories_container">
+    <div class="stops_container">
         <GrayButton on:click={() => {
             console.log('yay')
+            showSurprise()
         }}/>
         <GrayButton/>
         <GrayButton/>
@@ -50,7 +61,7 @@
         justify-content: space-between;
     }
 
-    .categories_container {
+    .stops_container {
         width: 100vw;
         /*height: 300px;*/
         overflow: scroll;
