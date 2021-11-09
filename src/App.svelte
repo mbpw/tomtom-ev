@@ -2,13 +2,16 @@
   import logo from './assets/giphy.gif'
   import Counter from './lib/Counter.svelte'
   import {RouteGenerator} from './computing_engine/route-generator'
+  let route_info = 'not computed'
   let result = 'nope';
   let distance = 0;
   let rg = new RouteGenerator();
 
   async function compute_route() {
-    let route = await rg.computeOptimalRoute()
+    let route = await rg.getNextRoute()
     console.log(route)
+    route_info=route.routes[0].summary.travelTimeInSeconds/3600
+
   }
 
   async function get_next_poi() {
@@ -32,7 +35,7 @@
   </p>
   <p>
     <button on:click={compute_route}>
-      Compute optimal route!
+      Compute next optimal route!, time (h) = {route_info}
     </button>
 
     <button on:click={get_next_poi}>
