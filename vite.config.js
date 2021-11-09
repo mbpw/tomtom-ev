@@ -1,13 +1,20 @@
 import {defineConfig} from 'vite'
 import {svelte} from '@sveltejs/vite-plugin-svelte'
 import {VitePWA} from 'vite-plugin-pwa'
+import sveltePreprocess from 'svelte-preprocess';
+
 
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-      svelte(),
-      // TODO: Configure PWA with these documentation https://vite-plugin-pwa.netlify.app/guide/generate.html
+      svelte({
+          preprocess: sveltePreprocess({
+              scss: {
+                  prependData: `@import './src/styles.scss';`
+              }
+          }),
+      }),
       VitePWA({
           includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
           manifest: {
