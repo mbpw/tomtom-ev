@@ -16,9 +16,11 @@
     let ps = new POISearcher('pedestrian', 1800);
 
     let ev_stations = [];
-    let ev_pois_tourist = [];
 
-
+    function pause(milliseconds) {
+        var dt = new Date();
+        while ((new Date()) - dt <= milliseconds) { /* Do nothing */ }
+    }
     async function compute_route() {
         let route = await rg.getNextRoute()
         console.log(route)
@@ -57,14 +59,24 @@
     }
 
     async function calculatePolyogns() {
-        ev_stations.results.forEach(async (element) => {
+        // ev_stations.results.forEach(async (element) => {
+        //     console.log(element.position)
+        //     let lat = element.position.lat
+        //     let lon = element.position.lon
+        //     let poly = await ps.calculatePolygon(lat, lon)
+        //     element.rangePolygon = poly
+        //     console.log(poly)
+        // })
+
+        for (let element of ev_stations.results) {
             console.log(element.position)
             let lat = element.position.lat
             let lon = element.position.lon
             let poly = await ps.calculatePolygon(lat, lon)
             element.rangePolygon = poly
+            pause(200)
             console.log(poly)
-        })
+        }
     }
 
 </script>
