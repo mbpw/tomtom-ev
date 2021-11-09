@@ -1,7 +1,5 @@
 <script>
-    import Header from "./Components/Header.svelte";
+    import Destination from "./AppScreens/Desitnation/Destination.svelte";
 </script>
 
-<Header>
-    Ready, steady...
-</Header>
+<Destination />
