@@ -16,32 +16,33 @@ export default defineConfig({
           }),
       }),
       VitePWA({
-          includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+          mode: 'development',
+          base: '/',
+          includeAssets: ['favicon.svg'],
           manifest: {
-              name: 'Name of your app',
-              short_name: 'Short name of your app',
-              description: 'Description of your app',
+              name: 'PWA Basic',
+              short_name: 'PWA Basic',
               theme_color: '#ffffff',
               icons: [
                   {
-                      src: 'pwa-192x192.png',
+                      src: 'pwa-192x192.png', // <== don't add slash, for testing
                       sizes: '192x192',
                       type: 'image/png',
                   },
                   {
-                      src: 'pwa-512x512.png',
+                      src: '/pwa-512x512.png', // <== don't remove slash, for testing
                       sizes: '512x512',
                       type: 'image/png',
                   },
                   {
-                      src: 'pwa-512x512.png',
+                      src: 'pwa-512x512.png', // <== don't add slash, for testing
                       sizes: '512x512',
                       type: 'image/png',
                       purpose: 'any maskable',
-                  }
-              ]
-          }
-      })
+                  },
+              ],
+          },
+      }),
   ],
     publicDir: 'public',
     base: '/',

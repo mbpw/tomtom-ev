@@ -1,6 +1,5 @@
 <script>
   import logo from './assets/giphy.gif'
-  import Counter from './Components/Counter.svelte'
   import Map from './Components/Map.svelte'
   import {globalMap} from "./store";
   import {RouteGenerator} from './computing_engine/route-generator'
