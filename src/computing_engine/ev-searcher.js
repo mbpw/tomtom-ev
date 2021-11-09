@@ -1,5 +1,4 @@
 import ky from 'ky';
-import {car_params} from "./temp_data";
 
 const endpoint = 'https://api.tomtom.com/search/2/searchAlongRoute/';
 

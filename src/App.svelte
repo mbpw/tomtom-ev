@@ -3,6 +3,7 @@
     import Counter from './lib/Counter.svelte'
     import {RouteGenerator} from './computing_engine/route-generator'
     import {EVSearcher} from "./computing_engine/ev-searcher";
+    import {POISearcher} from "./computing_engine/poi-searcher";
 
     let startPoint = [51.03994, 11.93770]
     let endPoint = [50.10406, 8.62416]
@@ -12,7 +13,9 @@
     let distance = 0;
     let rg = new RouteGenerator();
     let es = new EVSearcher(startPoint, endPoint);
+    let ps = new POISearcher('pedestrian', 1800);
 
+    let ev_stations = [];
     let ev_pois_tourist = [];
 
 
@@ -37,11 +40,31 @@
     }
 
     async function searchEVs() {
-        console.log(es.computeEVs())
+        ev_stations = await es.computeEVs()
     }
 
     async function showLegs() {
         console.log(JSON.stringify(es.parsePls()));
+    }
+
+    async function showStations() {
+        console.log(JSON.stringify(ev_stations));
+    }
+
+    async function displayRoute() {
+        // map here
+        return 0
+    }
+
+    async function calculatePolyogns() {
+        ev_stations.results.forEach(async (element) => {
+            console.log(element.position)
+            let lat = element.position.lat
+            let lon = element.position.lon
+            let poly = await ps.calculatePolygon(lat, lon)
+            element.rangePolygon = poly
+            console.log(poly)
+        })
     }
 
 </script>
@@ -72,6 +95,15 @@
         </button>
         <button on:click={showLegs}>
             Show legs :)
+        </button>
+        <button on:click={showStations}>
+            Show stations
+        </button>
+        <button on:click={displayRoute}>
+            Display route on map
+        </button>
+        <button on:click={calculatePolyogns}>
+            Calculate polygons
         </button>
 
     </p>
