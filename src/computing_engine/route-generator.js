@@ -6,7 +6,8 @@ const endpoint = 'https://api.tomtom.com/routing/1/calculateLongDistanceEVRoute/
 const vehicleEngineType = 'electric'
 const key = 'KSiA3cYn3i5bjlooe5NlxW5tR5uF0t7P';
 export class RouteGenerator {
-    constructor(startPoint = [50,21], endPoint = [45,20], constantSpeedConsumptionInkWhPerHundredkm ="32,10.87:77,18.01", currentChargeInkWh=20, maxChargeInkWh=40, minChargeAtDestinationInkWh=4,minChargeAtChargingStopsInkWh=4, POIs = null, evStations = null) {
+    constructor(startPoint = [52.32563573919947, 10.523825676170611]
+        , endPoint = [52.509548827862005, 13.62762775333342], constantSpeedConsumptionInkWhPerHundredkm ="32,10.87:77,18.01", currentChargeInkWh=20, maxChargeInkWh=40, minChargeAtDestinationInkWh=4,minChargeAtChargingStopsInkWh=4, POIs = null, evStations = null) {
         this.startPoint = startPoint
         this.endPoint = endPoint
         this.constantSpeedConsumptionInkWhPerHundredkm = constantSpeedConsumptionInkWhPerHundredkm
@@ -43,6 +44,7 @@ export class RouteGenerator {
         this.optimalRoute = optimalRoute
         this.optimalRouteTravelTime = optimalRoute.routes[0].summary.travelTimeInSeconds
         this.actualRouteTravelTime = this.optimalRouteTravelTime
+        console.log(this.optimalRoute)
         return this.optimalRoute
     }
 
