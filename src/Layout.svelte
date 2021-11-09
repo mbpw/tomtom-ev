@@ -16,10 +16,7 @@
 {/if}
 
 {#if $openedScreen === 2}
-    <div in:fly={flyInOptions} out:fly={flyOutOptions}
-         on:click={() => {
-        $openedScreen = 1;
-    }}>
+    <div in:fly={flyInOptions} out:fly={flyOutOptions}>
         <Stops />
     </div>
 {/if}
