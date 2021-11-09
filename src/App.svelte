@@ -1,21 +1,20 @@
 <script>
-  import logo from './assets/giphy.gif'
-  import Map from './Components/Map.svelte'
-  import {globalMap} from "./store";
-  import {RouteGenerator} from './computing_engine/route-generator'
-  import Layout from "./Layout.svelte";
-  let route_info = 'not computed'
-  let result = 'nope';
-  let distance = 0;
-  let rg = new RouteGenerator();
+    import Map from './Components/Map.svelte'
+    import {RouteGenerator} from './computing_engine/route-generator'
+    import Layout from "./Layout.svelte";
 
-  let kamil = true;
+    let route_info = 'not computed'
+    let result = 'nope';
+    let distance = 0;
+    let rg = new RouteGenerator();
 
-  async function compute_route() {
-      let route = await rg.getNextRoute()
-      console.log(route)
-      route_info = route.routes[0].summary.travelTimeInSeconds / 3600
-  }
+    let kamil = true;
+
+    async function compute_route() {
+        let route = await rg.getNextRoute()
+        console.log(route)
+        route_info = route.routes[0].summary.travelTimeInSeconds / 3600
+    }
 
     async function get_next_poi() {
         let routeOffer = await rg.prepareRouteOffer()
@@ -41,33 +40,32 @@
                 Change POI: {result} + distance = {distance}
             </button>
         </p>
-      <Map />
+        <Map/>
     </main>
 {:else}
     <Layout/>
 {/if}
 
 
-
 <style lang="scss">
-  :root {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
+    :root {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
 
-  main {
-    text-align: center;
-    padding: 1em;
-    margin: 0 auto;
-  }
+    main {
+        text-align: center;
+        padding: 1em;
+        margin: 0 auto;
+    }
 
-  h1 {
-    color: $primary;
-    text-transform: uppercase;
-    font-size: 4rem;
-    font-weight: 100;
-    line-height: 1.1;
-    margin: 2rem auto;
-    max-width: 14rem;
-  }
+    h1 {
+        color: $primary;
+        text-transform: uppercase;
+        font-size: 4rem;
+        font-weight: 100;
+        line-height: 1.1;
+        margin: 2rem auto;
+        max-width: 14rem;
+    }
 </style>
