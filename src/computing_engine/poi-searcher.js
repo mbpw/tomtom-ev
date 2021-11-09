@@ -31,7 +31,7 @@ export class POISearcher {
     }
 
     getGeomSearchEndpointURL(query = "", limit = 100) {
-        return endpoint_search + query + ".json?key=" + key + '&limit=' + limit;
+        return endpoint_search + query + ".json?key=" + key + '&categorySet=7315,9376,7314,9361&limit=' + limit;
     }
 
     async makeApiPostCall(endpoint, body) {

@@ -21,8 +21,11 @@
 
   let kamil = true;
 
-  let ev_stations = [];
-let ev_coords = [];
+  let ev_stations = {"results": []};
+  let ev_coords = [];
+
+  let pointsList = []
+  let stationsList = []
 
   function pause(milliseconds) {
     var dt = new Date();
@@ -35,8 +38,7 @@ let ev_coords = [];
       const actualTravelTime = rg.actualRouteTravelTime
 
       route_info =  actualTravelTime === optimalTravelTime ? "optimal" : 100 - actualTravelTime/optimalTravelTime
-      let pointsList = []
-      let stationsList = []
+
       for (const leg of route.routes[0].legs) {
           for (const point of leg.points) {
               pointsList.push([point.longitude, point.latitude])
@@ -46,6 +48,10 @@ let ev_coords = [];
       console.log(stationsList)
       md.drawRouteOnMap(pointsList, true, false)
       md.drawEVStationOnMap(stationsList)
+      let optimal_pois = await es.batchLatLonSearch(stationsList)
+      for (const poi of optimal_pois.batchItems) {
+          ev_stations.results.push(poi.response.results[0])
+      }
   }
 
     async function get_next_poi() {
@@ -60,7 +66,11 @@ let ev_coords = [];
   }
 
   async function searchEVs() {
-    ev_stations = await es.computeEVs()
+      let stations = await es.computeEVs()
+      console.log(stations.results)
+      for(const station of stations.results) {
+          ev_stations.results.push(station)
+      }
   }
 
   async function showLegs() {
@@ -68,7 +78,7 @@ let ev_coords = [];
   }
 
   async function showStations() {
-    console.log(JSON.stringify(ev_stations));
+    console.log(JSON.stringify(ev_stations.results));
     for (let element of ev_stations.results) {
         ev_coords.push([element.position.lon, element.position.lat])
     }
@@ -100,7 +110,7 @@ let ev_coords = [];
         let poly = await ps.calculatePolygon(lat, lon)
         element.rangePolygon = poly
         pause(200)
-        let pois = await ps.computePOIs('tourist,park', poly.reachableRange.boundary)
+        let pois = await ps.computePOIs('', poly.reachableRange.boundary)
         element.pois = pois
         pause(200)
     }
