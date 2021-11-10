@@ -201,7 +201,11 @@ export class MapDrawer{
         for (const marker of this.EVStations) {
             marker.remove()
         }
+        for (const poi of this.Pois) {
+            poi.marker.remove()
+        }
         this.EVStations = []
+        this.Pois = []
         globalMap.update(map => {
             console.log(map)
             if (this.routeLayerId!=='0') {

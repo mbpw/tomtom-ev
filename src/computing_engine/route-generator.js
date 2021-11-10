@@ -8,7 +8,6 @@ const key = 'KSiA3cYn3i5bjlooe5NlxW5tR5uF0t7P';
 
 export class RouteGenerator {
     constructor(startPoint = [52.32563573919947, 10.523825676170611], endPoint = [52.509548827862005, 13.62762775333342], constantSpeedConsumptionInkWhPerHundredkm = "32,10.87:77,18.01", currentChargeInkWh = 20, maxChargeInkWh = 40, minChargeAtDestinationInkWh = 4, minChargeAtChargingStopsInkWh = 4, POIs = null, evStations = null) {
-        this.randomCounter = 0;
         this.startPoint = startPoint
         this.endPoint = endPoint
         this.constantSpeedConsumptionInkWhPerHundredkm = constantSpeedConsumptionInkWhPerHundredkm
@@ -114,13 +113,12 @@ export class RouteGenerator {
     }
 
     async selectPOINearStation(station) { //POI selection from given station later
-        // const POI = station.pois.find(element => element.visited === false);
-        const POI = station.pois[this.randomCounter++]
+        const POI = station.pois.find(element => element.visited === false);
         console.log(station)
         console.log(POI)
         const index = station.pois.indexOf(POI)
         console.log(index)
-        if (index != -1) {
+        if (index !== -1) {
             station.pois[index].visited = true
             const POILocation = [POI.position.lat, POI.position.lon]
             const stationLocation = [station.position.lat, station.position.lon]
@@ -149,7 +147,7 @@ export class RouteGenerator {
 
 
     async markPoisAsNotVisited() {
-        console.log(this.evStations)
+        // console.log(this.evStations)
         for (let station of this.evStations) {
             station.visited = false
             for (let poi of station.pois) {

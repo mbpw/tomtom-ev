@@ -13,11 +13,11 @@ Output: ["46.37433, 19.99664", "46.37488, 19.99635"]
  */
 function parseGeom(geom) {
     let points = [];
-    console.log(geom)
+    // console.log(geom)
     geom.forEach((element) => {
         points.push("" + element.latitude + "," + element.longitude);
     });
-    console.log(points)
+    // console.log(points)
     return points;
 }
 
@@ -84,7 +84,7 @@ export class POISearcher {
             console.log("Geometry not included in the call!")
         }
         let url = this.getGeomSearchEndpointURL(query)
-        console.log(parseGeom(geom))
+        // console.log(parseGeom(geom))
         let g = {
             "geometryList": [
                 {
@@ -94,7 +94,7 @@ export class POISearcher {
         }
         let body = {json: g}
         let pois = await this.makeApiPostCall(url, body)
-        console.log(pois)
+        // console.log(pois)
         return pois
     }
 

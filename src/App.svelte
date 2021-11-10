@@ -11,8 +11,8 @@
     let route_info = 'not computed'
     let result = 'nope';
     let distance = 0;
-    let startPoint = [51.03994, 11.93770]
-    let endPoint = [50.10406, 8.62416]
+    let startPoint = [52.32563573919947, 10.523825676170611]
+    let endPoint = [52.509548827862005, 13.62762775333342]
     let routeOffer = undefined
     let routeLayerId = '0'
     let rg = new RouteGenerator();
@@ -52,31 +52,41 @@
     let poisList = []
 
     async function get_next_route() {
+
         console.log("clearWalkRoutes...")
         md.clearWalkRoutes()
 
         console.log("Prepare variables...")
-        let pointsList = []
-        let stationsList = []
-
+        ev_stations = {results: []}
+        let routeCoordsList = []
+        let stationsCoordsList = []
+        rg.startPoint = startPoint.toString().split(',') // TODO: correct?
+        rg.endPoint = endPoint.toString().split(',')
 
         console.log("Get first (optimal) route...")
         let optimal_route = await rg.computeOptimalRoute()
         let pts = await rg.getPointsOfOptimalRoute()
 
 
-        console.log("Get route's EV stations...")
+        console.log("Get route's EV stations and add to list...")
         for (const leg of optimal_route.routes[0].legs) {
             for (const point of leg.points) {
-                pointsList.push([point.longitude, point.latitude])
+                routeCoordsList.push([point.longitude, point.latitude])
             }
-            stationsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
+            stationsCoordsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
         }
-
-        console.log("Searching for EV")
-        let optimal_pois = await es.batchLatLonSearch(stationsList)
+        let optimal_pois = await es.batchLatLonSearch(stationsCoordsList)
         for (const poi of optimal_pois.batchItems) {
             ev_stations.results.push(poi.response.results[0])
+        }
+
+        console.log("Replacing legs and searching for EV stations again...")
+        es.replaceRouteLegs(pts)
+
+        let stations2 = await es.computeEVs()
+        // console.log(stations2.results)
+        for (const station of stations2.results) {
+            ev_stations.results.push(station)
         }
 
         console.log("Calculating reachable range...")
@@ -84,7 +94,7 @@
         let i1 = 0
         for (let element of poly1.batchItems) {
             ev_stations.results[i1].reachableRange = element.response.reachableRange.boundary
-            console.log(element.response.reachableRange.boundary)
+            // console.log(element.response.reachableRange.boundary)
             i1++
         }
         console.log("Batch search POIs...")
@@ -112,33 +122,24 @@
         this.ev_stations = rg.evStations
         console.log(ev_stations)
 
-        console.log("Replacing legs and searching for EV stations again...")
-        es.replaceRouteLegs(pts)
 
-        let stations2 = await es.computeEVs()
-        // console.log(stations2.results)
-        for (const station of stations2.results) {
-            ev_stations.results.push(station)
-        }
-
-
-        console.log("Calculating reachable range...")
-        let poly = await ps.calculateBatchPolygons(ev_stations)
-        let i = 0
-        for (let element of poly.batchItems) {
-            ev_stations.results[i].reachableRange = element.response.reachableRange.boundary
-            console.log(element.response.reachableRange.boundary)
-            i++
-        }
-        console.log("Batch search POIs...")
-        let pois = await ps.searchBatchPois(ev_stations.results)
-        let k = 0
-        for (let poi of pois.batchItems) {
-            ev_stations.results[k].pois = poi.response.results
-            ev_stations.results[k].visited = false
-            k++
-        }
-
+        // console.log("Calculating reachable range...")
+        // let poly = await ps.calculateBatchPolygons(ev_stations)
+        // let i = 0
+        // for (let element of poly.batchItems) {
+        //     ev_stations.results[i].reachableRange = element.response.reachableRange.boundary
+        //     console.log(element.response.reachableRange.boundary)
+        //     i++
+        // }
+        // console.log("Batch search POIs...")
+        // let pois = await ps.searchBatchPois(ev_stations.results)
+        // let k = 0
+        // for (let poi of pois.batchItems) {
+        //     ev_stations.results[k].pois = poi.response.results
+        //     ev_stations.results[k].visited = false
+        //     k++
+        // }
+        console.log("DONE computing optimal route")
         // console.log(ev_stations)
 
     }
@@ -161,7 +162,8 @@
     }
 
     async function showStations() {
-        console.log(JSON.stringify(ev_stations.results));
+        console.log(ev_stations)
+        // console.log(JSON.stringify(ev_stations.results));
         for (let element of ev_stations.results) {
             ev_coords.push([element.position.lon, element.position.lat])
         }
@@ -171,7 +173,7 @@
     async function displayRoute() {
         console.log("Prepare route offer...")
         routeOffer = await rg.prepareRouteOffer(ev_stations)
-        console.log(routeOffer)
+        // console.log(routeOffer)
 
 
         for (const leg of routeOffer.routes[0].legs) {
@@ -194,7 +196,7 @@
         md.drawStartandStopOnMap([startCoords.longitude, startCoords.latitude], [stopCoords.longitude, stopCoords.latitude])
 
         for (const leg of routeOffer.routes[0].legs) {
-            console.log(leg)
+            // console.log(leg)
             if (leg.proposedPoi !== undefined) {
                 console.log(leg.proposedPoi)
                 result = leg.proposedPoi.poi.name
@@ -237,6 +239,7 @@
     }
 
 
+
 </script>
 {#if kamil}
     <main>
@@ -245,7 +248,7 @@
         </button>
 
         <h1>Hello world!!!</h1>
-
+        <p>From <input bind:value={startPoint} /> to <input bind:value={endPoint} name="" /></p>
         <p>
             <button on:click={zoom_to_popup}>
                 Zoom to POI popup
@@ -254,27 +257,27 @@
             <button on:click={get_next_route}>
                 Change POI: {result} + distance = {distance}
             </button>
-            <button on:click={replace_legs}>
-                Replace legs
-            </button>
-            <button on:click={searchEVs}>
-                Search for EVs along route
-            </button>
-            <button on:click={showLegs}>
-                Show legs :)
+            <!--            <button on:click={replace_legs}>-->
+            <!--                Replace legs-->
+            <!--            </button>-->
+            <!--            <button on:click={searchEVs}>-->
+            <!--                Search for EVs along route-->
+            <!--            </button>-->
+            <!--            <button on:click={showLegs}>-->
+            <!--                Show legs :)-->
+            <!--            </button>-->
+            <button on:click={displayRoute}>
+                Display route on map
             </button>
             <button on:click={showStations}>
                 Show stations
             </button>
-            <button on:click={displayRoute}>
-                Display route on map
-            </button>
             <button on:click={clearMap}>
                 Clear Map
             </button>
-            <button on:click={calculatePolyogns}>
-                Calculate polygons
-            </button>
+            <!--            <button on:click={calculatePolyogns}>-->
+            <!--                Calculate polygons-->
+            <!--            </button>-->
         </p>
         <Map/>
     </main>
