@@ -12,6 +12,7 @@
     import {stopsPreferences} from "../../stores/userInput";
 
     import {RG} from "../../computing_engine/route-generator";
+    import {MD} from "../../map_utils/map-drawer";
 
     const {open} = getContext('simple-modal');
 
@@ -32,6 +33,7 @@
         let routes = await RG.computeAllRouteOffers(3)
         console.log(routes)
         routesStore.set(routes)
+        MD.drawWholeRouteOnMap(RG.offeredRoutes[0])
     }
 </script>
 
