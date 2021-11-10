@@ -49,25 +49,68 @@
 
     }
 
+    let poisList = []
+
     async function get_next_route() {
         console.log("clearWalkRoutes...")
         md.clearWalkRoutes()
 
+        console.log("Prepare variables...")
+        let pointsList = []
+        let stationsList = []
+
+
         console.log("Get first (optimal) route...")
         let optimal_route = await rg.computeOptimalRoute()
         let pts = await rg.getPointsOfOptimalRoute()
-        rg.po
 
-        console.log("Searching for pois from EV")
-        let optimal_pois = await es.batchLatLonSearch(pts)
+
+        console.log("Get route's EV stations...")
+        for (const leg of optimal_route.routes[0].legs) {
+            for (const point of leg.points) {
+                pointsList.push([point.longitude, point.latitude])
+            }
+            stationsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
+        }
+
+        console.log("Searching for EV")
+        let optimal_pois = await es.batchLatLonSearch(stationsList)
         for (const poi of optimal_pois.batchItems) {
             ev_stations.results.push(poi.response.results[0])
         }
-        let stations = await es.computeEVs()
-        // console.log(stations.results)
-        for (const station of stations.results) {
-            ev_stations.results.push(station)
+
+        console.log("Calculating reachable range...")
+        let poly1 = await ps.calculateBatchPolygons(ev_stations)
+        let i1 = 0
+        for (let element of poly1.batchItems) {
+            ev_stations.results[i1].reachableRange = element.response.reachableRange.boundary
+            console.log(element.response.reachableRange.boundary)
+            i1++
         }
+        console.log("Batch search POIs...")
+        let pois1 = await ps.searchBatchPois(ev_stations.results)
+        let k1 = 0
+        for (let poi of pois1.batchItems) {
+            ev_stations.results[k1].pois = poi.response.results
+            // ev_stations.results[k1].visited = false
+            k1++
+        }
+
+        // let stations = await es.computeEVs()
+        // // console.log(stations.results)
+        // for (const station of stations.results) {
+        //     ev_stations.results.push(station)
+        // }
+
+
+        console.log("Replacing stations in RouteGenerator...")
+        console.log(ev_stations)
+        console.log("markStationsAsVisited")
+        await rg.markStationsAsVisited(ev_stations.results)
+        console.log("markPoisAsNotVisited...")
+        await rg.markPoisAsNotVisited()
+        this.ev_stations = rg.evStations
+        console.log(ev_stations)
 
         console.log("Replacing legs and searching for EV stations again...")
         es.replaceRouteLegs(pts)
@@ -78,9 +121,6 @@
             ev_stations.results.push(station)
         }
 
-        console.log("Replacing stations in RouteGenerator...")
-        console.log(ev_stations)
-        await rg.markStationsAsVisited(ev_stations.results)
 
         console.log("Calculating reachable range...")
         let poly = await ps.calculateBatchPolygons(ev_stations)
@@ -95,18 +135,45 @@
         let k = 0
         for (let poi of pois.batchItems) {
             ev_stations.results[k].pois = poi.response.results
+            ev_stations.results[k].visited = false
             k++
         }
 
+        // console.log(ev_stations)
 
+    }
+
+    async function replace_legs() {
+        let pts = await rg.getPointsOfOptimalRoute()
+        es.replaceRouteLegs(pts)
+    }
+
+    async function searchEVs() {
+        let stations = await es.computeEVs()
+        console.log(stations.results)
+        for (const station of stations.results) {
+            ev_stations.results.push(station)
+        }
+    }
+
+    async function showLegs() {
+        console.log(JSON.stringify(es.parsePls()));
+    }
+
+    async function showStations() {
+        console.log(JSON.stringify(ev_stations.results));
+        for (let element of ev_stations.results) {
+            ev_coords.push([element.position.lon, element.position.lat])
+        }
+        md.drawEVStationOnMap(ev_coords, false)
+    }
+
+    async function displayRoute() {
         console.log("Prepare route offer...")
         routeOffer = await rg.prepareRouteOffer(ev_stations)
         console.log(routeOffer)
 
 
-        let pointsList = []
-        let stationsList = []
-        let poisList = []
         for (const leg of routeOffer.routes[0].legs) {
             for (const point of leg.points) {
                 pointsList.push([point.longitude, point.latitude])
@@ -146,37 +213,6 @@
         // result = routeOffer.POIs[0].poi.name
         // distance = routeOffer.POIs[0].route[0].summary.lengthInMeters
 
-
-    }
-
-    async function replace_legs() {
-        let pts = await rg.getPointsOfOptimalRoute()
-        es.replaceRouteLegs(pts)
-    }
-
-    async function searchEVs() {
-        let stations = await es.computeEVs()
-        console.log(stations.results)
-        for (const station of stations.results) {
-            ev_stations.results.push(station)
-        }
-    }
-
-    async function showLegs() {
-        console.log(JSON.stringify(es.parsePls()));
-    }
-
-    async function showStations() {
-        console.log(JSON.stringify(ev_stations.results));
-        for (let element of ev_stations.results) {
-            ev_coords.push([element.position.lon, element.position.lat])
-        }
-        md.drawEVStationOnMap(ev_coords, false)
-    }
-
-    async function displayRoute() {
-        // map here
-        return 0
     }
 
     async function clearMap() {
