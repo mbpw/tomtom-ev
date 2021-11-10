@@ -5,6 +5,9 @@ import {WalkSimulator} from "./walk-simulator";
 const endpoint = 'https://api.tomtom.com/routing/1/calculateLongDistanceEVRoute/';
 const vehicleEngineType = 'electric'
 const key = 'KSiA3cYn3i5bjlooe5NlxW5tR5uF0t7P';
+
+
+
 export class RouteGenerator {
     constructor(startPoint = [52.32563573919947, 10.523825676170611], endPoint = [52.509548827862005, 13.62762775333342], constantSpeedConsumptionInkWhPerHundredkm ="32,10.87:77,18.01", currentChargeInkWh=20, maxChargeInkWh=40, minChargeAtDestinationInkWh=4,minChargeAtChargingStopsInkWh=4, POIs = null, evStations = null) {
         this.startPoint = startPoint
@@ -29,6 +32,7 @@ export class RouteGenerator {
         this.optimalRoute = null
         this.optimalRouteTravelTime = 0
         this.actualRouteTravelTime = 0
+        this.offeredRoutes = []
     }
     getEndpointURL(start_x, start_y, stop_x, stop_y, currentCharge){
         return endpoint + start_x+','+start_y+':'+stop_x+','+stop_y+'/json?key='+key+'&vehicleEngineType='+vehicleEngineType+'&constantSpeedConsumptionInkWhPerHundredkm='+this.constantSpeedConsumptionInkWhPerHundredkm+'&currentChargeInkWh='+currentCharge+'&maxChargeInkWh='+this.maxChargeInkWh+'&minChargeAtDestinationInkWh='+this.minChargeAtDestinationInkWh+'&minChargeAtChargingStopsInkWh='+this.minChargeAtChargingStopsInkWh
@@ -44,12 +48,16 @@ export class RouteGenerator {
         let body = {json: car_params}
         let optimalRoute = await this.makeOptimalRouteApiCall(endpointURL, body)
         this.optimalRoute = optimalRoute
+        console.log(this.optimalRoute.routes[0].legs)
         for (const leg of this.optimalRoute.routes[0].legs) {
             if (leg.summary.chargingInformationAtEndOfLeg !== undefined) {
                 const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
                 const station = this.evStations.find(element => element.address.postalCode === postalCode);
-                const index = this.evStations.indexOf(station)
-                this.evStations[index].visited = true
+                if (station !== undefined) {
+                    const index = this.evStations.indexOf(station)
+                    console.log(postalCode)
+                    this.evStations[index].visited = true
+                }
             }
         }
         this.optimalRouteTravelTime = optimalRoute.routes[0].summary.travelTimeInSeconds
@@ -136,5 +144,44 @@ export class RouteGenerator {
         POI.route = route
         return POI
     }
+    prettifyCodeName(string)
+    {
+        return (string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()).replace('_',' ');
+    }
+
+    createInfoSummary(routes){
+        let infoSummary = []
+        console.log(routes)
+        for (const route of routes){
+            let routeDict = {}
+            routeDict.duration = route.routes[0].summary.travelTimeInSeconds
+            routeDict.distance = route.routes[0].summary.lengthInMeters
+            routeDict.stops = []
+            for (const leg of route.routes[0].legs){
+                let stopDescription = {}
+                if(leg.proposedPoi!==undefined) {
+                    stopDescription.name = this.prettifyCodeName(leg.proposedPoi.poi.classifications[0].code)
+                }
+                else {
+                    stopDescription.name = "Reading time!"
+                }
+                stopDescription.arrivalTime = leg.summary.arrivalTime
+                routeDict.stops.push(stopDescription)
+            }
+            infoSummary.push(routeDict)
+        }
+        return infoSummary
+    }
+
+    async computeAllRouteOffers(numOffers = 3){
+        let routes = []
+        for(let i = 0; i < numOffers; i++){
+            routes.push(await this.prepareRouteOffer())
+        }
+        this.offeredRoutes = routes
+        return this.createInfoSummary(this.offeredRoutes)
+    }
 
 }
+
+export const RG = new RouteGenerator()

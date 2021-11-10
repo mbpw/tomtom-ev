@@ -7,6 +7,8 @@
   import {RouteGenerator} from './computing_engine/route-generator'
   import {MapDrawer} from "./map_utils/map-drawer";
   import Layout from "./Layout.svelte";
+  import {ev_stations} from "./computing_engine/temp_data";
+
   let route_info = 'not computed'
   let result = 'nope';
   let distance = 0;
@@ -21,7 +23,7 @@
 
   let kamil = true;
 
-  let ev_stations = {"results": []};
+  // let ev_stations = {"results": []};
   let ev_coords = [];
 
   let pointsList = []
