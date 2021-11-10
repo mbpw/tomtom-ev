@@ -54,11 +54,39 @@
       }
   }
 
-    async function get_next_poi() {
+    async function get_next_route() {
         let routeOffer = await rg.prepareRouteOffer()
         console.log(routeOffer)
-        result = routeOffer.POIs[0].poi.name
-        distance = routeOffer.POIs[0].route[0].summary.lengthInMeters
+        let pointsList = []
+        let stationsList = []
+        for (const leg of routeOffer.routes[0].legs) {
+            for (const point of leg.points) {
+                pointsList.push([point.longitude, point.latitude])
+            }
+            stationsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
+        }
+        console.log(stationsList)
+        md.drawRouteOnMap(pointsList, true, false)
+        md.drawEVStationOnMap(stationsList)
+        for (const leg of routeOffer.routes[0].legs){
+            console.log(leg)
+            if(leg.proposedPoi !== undefined) {
+                console.log(leg.proposedPoi)
+                result = leg.proposedPoi.poi.name
+                let walkPointsList = []
+                for (const point of leg.proposedPoi.route[0].legs[0].points) {
+                    walkPointsList.push([point.longitude, point.latitude])
+                }
+        md.drawWalkRouteOnMap(walkPointsList,false)
+                walkPointsList = []
+            }
+        }
+        const optimalTravelTime = rg.optimalRouteTravelTime
+        const actualTravelTime = rg.actualRouteTravelTime
+
+        distance = actualTravelTime === optimalTravelTime ? "optimal" : 100 - (actualTravelTime/optimalTravelTime)*100
+        // result = routeOffer.POIs[0].poi.name
+        // distance = routeOffer.POIs[0].route[0].summary.lengthInMeters
     }
   async function replace_legs() {
     let pts = await rg.getPointsOfOptimalRoute()
@@ -132,7 +160,7 @@
                 Compute next optimal route!, time (h) = {route_info}
             </button>
 
-            <button on:click={get_next_poi}>
+            <button on:click={get_next_route}>
                 Change POI: {result} + distance = {distance}
             </button>
           <button on:click={replace_legs}>

@@ -1,13 +1,12 @@
 import ky from 'ky';
-import {car_params} from './temp_data';
-// import {WalkSimulator} from "./walk-simulator";
+import {car_params, ev_stations} from './temp_data';
+import {WalkSimulator} from "./walk-simulator";
 
 const endpoint = 'https://api.tomtom.com/routing/1/calculateLongDistanceEVRoute/';
 const vehicleEngineType = 'electric'
 const key = 'KSiA3cYn3i5bjlooe5NlxW5tR5uF0t7P';
 export class RouteGenerator {
-    constructor(startPoint = [52.32563573919947, 10.523825676170611]
-        , endPoint = [52.509548827862005, 13.62762775333342], constantSpeedConsumptionInkWhPerHundredkm ="32,10.87:77,18.01", currentChargeInkWh=20, maxChargeInkWh=40, minChargeAtDestinationInkWh=4,minChargeAtChargingStopsInkWh=4, POIs = null, evStations = null) {
+    constructor(startPoint = [52.32563573919947, 10.523825676170611], endPoint = [52.509548827862005, 13.62762775333342], constantSpeedConsumptionInkWhPerHundredkm ="32,10.87:77,18.01", currentChargeInkWh=20, maxChargeInkWh=40, minChargeAtDestinationInkWh=4,minChargeAtChargingStopsInkWh=4, POIs = null, evStations = null) {
         this.startPoint = startPoint
         this.endPoint = endPoint
         this.constantSpeedConsumptionInkWhPerHundredkm = constantSpeedConsumptionInkWhPerHundredkm
@@ -20,9 +19,12 @@ export class RouteGenerator {
         for (const POI of this.POIs){
             POI.visited = false
         }
-        this.evStations = [] //ev_stations.results
+        this.evStations = ev_stations.results
         for (const station of this.evStations){
             station.visited = false
+            for (const poi of station.pois.results){
+                poi.visited = false
+            }
         }
         this.optimalRoute = null
         this.optimalRouteTravelTime = 0
@@ -44,7 +46,6 @@ export class RouteGenerator {
         this.optimalRoute = optimalRoute
         this.optimalRouteTravelTime = optimalRoute.routes[0].summary.travelTimeInSeconds
         this.actualRouteTravelTime = this.optimalRouteTravelTime
-        console.log(this.optimalRoute)
         return this.optimalRoute
     }
 
@@ -61,6 +62,12 @@ export class RouteGenerator {
     }
 
     async getNextRoute(){
+        for (const station of this.evStations){
+            station.visited = false
+            for (const poi of station.pois.results){
+                poi.visited = false
+            }
+        }
         if (this.optimalRouteGoodEnough) {
             this.optimalRouteGoodEnough = false
             return await this.computeOptimalRoute()
@@ -92,21 +99,38 @@ export class RouteGenerator {
     }
 
     async prepareRouteOffer(){
-        // const route = await this.getNextRoute()
+        await this.getNextRoute()
         const POIsOnRoute = []
-        const firstLeg = this.optimalRoute.routes[0].legs[0] //iterate over all legs later
-        // const stationName = firstLeg.summary.chargingInformationAtEndOfLeg.chargingParkName //get POI by station name later
-        const stationName ='Total Schwielowsee Am Bahnhof Lienewitz'
-        const station = this.evStations.find(element => element.poi.name === stationName);
-        const proposedPOI = await this.selectPOINearStation(station)
-        POIsOnRoute.push(proposedPOI)
-        return {route:this.optimalRoute, POIs: POIsOnRoute}
+        console.log(this.optimalRoute.routes[0].legs)
+        for (const leg of this.optimalRoute.routes[0].legs){
+            if(leg.summary.chargingInformationAtEndOfLeg !== undefined) {
+                const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
+                console.log(leg.summary.chargingInformationAtEndOfLeg.chargingParkName)
+                const station = this.evStations.find(element => element.address.postalCode === postalCode);
+                console.log(station)
+                if (station !== undefined) {
+                    if (station.pois.results.length > 0) {
+                        const proposedPOI = await this.selectPOINearStation(station)
+                        console.log(proposedPOI)
+                        leg.proposedPoi = proposedPOI
+                    }
+                }
+            }
+        }
+
+        // const firstLeg = this.optimalRoute.routes[0].legs[0] //iterate over all legs later
+        // // const stationName = firstLeg.summary.chargingInformationAtEndOfLeg.chargingParkName //get POI by station name later
+        // const stationName ='Total Schwielowsee Am Bahnhof Lienewitz'
+        // const station = this.evStations.find(element => element.poi.name === stationName);
+        // const proposedPOI = await this.selectPOINearStation(station)
+        // POIsOnRoute.push(proposedPOI)
+        return this.optimalRoute
     }
 
     async selectPOINearStation(station){ //POI selection from given station later
-        const POI = this.POIs.find(element => element.visited === false);
-        const index = this.POIs.indexOf(POI)
-        this.POIs[index].visited = true
+        const POI = station.pois.results.find(element => element.visited === false);
+        const index = station.pois.results.indexOf(POI)
+        station.pois.results[index].visited = true
         const POILocation = [POI.position.lat,POI.position.lon]
         const stationLocation = [station.position.lat,station.position.lon]
         const ws = new WalkSimulator(stationLocation,POILocation)

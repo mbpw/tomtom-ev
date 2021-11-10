@@ -1,5 +1,5 @@
 import ky from 'ky';
-import {ev_stations, pois_in_city} from "./temp_data";
+// import {ev_stations, pois_in_city} from "./temp_data";
 
 const endpoint = 'https://api.tomtom.com/routing/1/calculateRoute/';
 const key = 'KSiA3cYn3i5bjlooe5NlxW5tR5uF0t7P';
