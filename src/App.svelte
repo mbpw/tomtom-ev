@@ -94,27 +94,19 @@
   }
 
   async function calculatePolyogns() {
-    // ev_stations.results.forEach(async (element) => {
-    //     console.log(element.position)
-    //     let lat = element.position.lat
-    //     let lon = element.position.lon
-    //     let poly = await ps.calculatePolygon(lat, lon)
-    //     element.rangePolygon = poly
-    //     console.log(poly)
-    // })
-
-    for (let element of ev_stations.results) {
-        // console.log(element.position)
-        let lat = element.position.lat
-        let lon = element.position.lon
-        let poly = await ps.calculatePolygon(lat, lon)
-        element.rangePolygon = poly
-        pause(200)
-        let pois = await ps.computePOIs('', poly.reachableRange.boundary)
-        element.pois = pois
-        pause(200)
-    }
-
+      let poly = await ps.calculateBatchPolygons(ev_stations)
+      let i = 0
+      for (let element of poly.batchItems) {
+          ev_stations.results[i].reachableRange = element.response.reachableRange.boundary
+          console.log(element.response.reachableRange.boundary)
+          i++
+      }
+      let pois = await ps.searchBatchPois(ev_stations.results)
+      let k = 0
+      for(let poi of pois.batchItems) {
+          ev_stations.results[k].pois = poi.response.results
+          k++
+      }
   }
 
 

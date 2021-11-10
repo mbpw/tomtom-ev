@@ -60,6 +60,22 @@ export const car_params = {
     }
 }
 
+export const categories = {
+    "Electric Vehicle Charging Station": 7309,
+    "Restaurant": 7315,
+    "Cafe/Pub": 9376,
+    "Shop": 9361,
+    "Amusement Park": 9902,
+    "Hotel/Motel": 7314,
+    "Zoo, Arboretum & Botanical Garden": 9927,
+    "Movie Theater": 7342,
+    "Theater": 7318,
+    "Park & Recreation Area": 9362,
+    "Tourist Attraction": 7376,
+    "Leisure Center": 9378
+    // Add more
+}
+
 export const ev_stations =
     {
         "summary": {
