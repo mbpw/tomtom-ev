@@ -56,15 +56,25 @@
         console.log("Get first (optimal) route...")
         let optimal_route = await rg.computeOptimalRoute()
         let pts = await rg.getPointsOfOptimalRoute()
+        rg.po
 
         console.log("Searching for pois from EV")
+        let optimal_pois = await es.batchLatLonSearch(pts)
+        for (const poi of optimal_pois.batchItems) {
+            ev_stations.results.push(poi.response.results[0])
+        }
+        let stations = await es.computeEVs()
+        // console.log(stations.results)
+        for (const station of stations.results) {
+            ev_stations.results.push(station)
+        }
 
-        console.log("Replacing legs and searching for EV stations...")
+        console.log("Replacing legs and searching for EV stations again...")
         es.replaceRouteLegs(pts)
 
-        let stations = await es.computeEVs()
-        console.log(stations.results)
-        for (const station of stations.results) {
+        let stations2 = await es.computeEVs()
+        // console.log(stations2.results)
+        for (const station of stations2.results) {
             ev_stations.results.push(station)
         }
 
