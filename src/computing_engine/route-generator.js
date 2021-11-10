@@ -158,15 +158,16 @@ export class RouteGenerator {
             routeDict.distance = route.routes[0].summary.lengthInMeters
             routeDict.stops = []
             for (const leg of route.routes[0].legs){
-                let stopDescription = {}
-                if(leg.proposedPoi!==undefined) {
-                    stopDescription.name = this.prettifyCodeName(leg.proposedPoi.poi.classifications[0].code)
+                if(leg.summary.chargingInformationAtEndOfLeg!==undefined) {
+                    let stopDescription = {}
+                    if (leg.proposedPoi !== undefined) {
+                        stopDescription.name = this.prettifyCodeName(leg.proposedPoi.poi.classifications[0].code)
+                    } else {
+                        stopDescription.name = "Reading time!"
+                    }
+                    stopDescription.arrivalTime = leg.summary.arrivalTime
+                    routeDict.stops.push(stopDescription)
                 }
-                else {
-                    stopDescription.name = "Reading time!"
-                }
-                stopDescription.arrivalTime = leg.summary.arrivalTime
-                routeDict.stops.push(stopDescription)
             }
             infoSummary.push(routeDict)
         }

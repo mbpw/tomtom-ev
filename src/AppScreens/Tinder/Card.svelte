@@ -34,7 +34,6 @@
     <div>
         <div class="stop"
              on:click={() => {
-                    // TODO: Zoomowanie na mapie do odpowiedniego markera i popupa
                     MD.zoomStart()
                     console.log('Pociśnięto START w routcie ' + routeIndex);
                 }}
@@ -50,10 +49,12 @@
         {#each route.stops as stop, i}
             <div class="stop"
                 on:click={() => {
-                    // TODO: Zoomowanie na mapie do odpowiedniego markera i popupa
                     let poi = RG.offeredRoutes[routeIndex].routes[0].legs[i].proposedPoi
                     if (poi !== undefined){
                         MD.zoomAndTogglePoi(poi)
+                    }
+                    else{
+                        MD.zoomAndToggleStation([RG.offeredRoutes[routeIndex].routes[0].legs[i].points.at(-1).longitude, RG.offeredRoutes[routeIndex].routes[0].legs[i].points.at(-1).latitude])
                     }
                     console.log('Pociśnięto element ' + i + ' w routcie ' + routeIndex);
                 }}
@@ -69,7 +70,6 @@
         {/each}
         <div class="stop"
              on:click={() => {
-                    // TODO: Zoomowanie na mapie do odpowiedniego markera i popupa
                     MD.zoomEnd()
                     console.log('Pociśnięto END w routcie ' + routeIndex);
                 }}

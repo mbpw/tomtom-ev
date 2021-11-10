@@ -7,7 +7,6 @@ export class MapDrawer{
         this.walkRouteIds = []
         this.EVStations = []
         this.Pois = []
-        this.experimentalPoi = undefined
         this.startPoint = undefined
         this.endPoint = undefined
     }
@@ -181,6 +180,15 @@ export class MapDrawer{
             return map
         })}
 
+    zoomAndToggleStation(stationCoords){
+        let stationCoordsLngLat = new tt.LngLat(stationCoords[0],stationCoords[1])
+        globalMap.update(map => {
+            let stationMarker = this.EVStations.find(stationMarker=>JSON.stringify(stationMarker.getLngLat())===JSON.stringify(stationCoordsLngLat))
+            stationMarker.togglePopup()
+            requestAnimationFrame(timestamp => this.zoomToPointAnimate(timestamp,window.performance.now(),2500,15, map.getZoom(),stationMarker.getLngLat(),map.getCenter(),map));
+            return map
+        })}
+
     zoomStart(){
         globalMap.update(map => {
             requestAnimationFrame(timestamp => this.zoomToPointAnimate(timestamp,window.performance.now(),2500,15, map.getZoom(),this.startPoint.getLngLat(),map.getCenter(),map));
@@ -272,7 +280,6 @@ export class MapDrawer{
         console.log('drawing route')
         this.drawRouteOnMap(pointsList, true, true)
         console.log('drawing stations')
-        console.log
         this.drawEVStationOnMap(stationsCoordsList,stationsList)
         console.log('drawing pois')
         this.drawPoisOnMap(poisList)
