@@ -6,6 +6,7 @@ const batch_endpoint_range = "https://api.tomtom.com/routing/1/batch/json/";
 const batch_endpoint = "https://api.tomtom.com/search/2/batch/sync.json/";
 
 const key = 'KSiA3cYn3i5bjlooe5NlxW5tR5uF0t7P';
+
 /*
 Input: [{"latitude": 46.37433, "longitude": 19.99664}, {"latitude": 46.37488,"longitude": 19.99635}, ...]
 Output: ["46.37433, 19.99664", "46.37488, 19.99635"]
@@ -14,7 +15,7 @@ function parseGeom(geom) {
     let points = [];
     console.log(geom)
     geom.forEach((element) => {
-        points.push(""+element.latitude+","+element.longitude);
+        points.push("" + element.latitude + "," + element.longitude);
     });
     console.log(points)
     return points;
@@ -36,11 +37,11 @@ export class POISearcher {
     }
 
     getBatchRangeEndpointURL() {
-        return batch_endpoint_range + '?key='+key
+        return batch_endpoint_range + '?key=' + key
     }
 
     getBatchSearchEndpointURL() {
-        return batch_endpoint + '?key='+key
+        return batch_endpoint + '?key=' + key
     }
 
     async makeApiPostCall(endpoint, body) {
@@ -68,9 +69,11 @@ export class POISearcher {
             let url = "/calculateReachableRange/" + element.position.lat + "," + element.position.lon + '/json?timeBudgetInSec=' + this.timeBudgetInSec + '&travelMode=' + this.travelMode;
             queries.push({"query": url})
         }
-        let body = {json:{
+        let body = {
+            json: {
                 "batchItems": queries
-            }}
+            }
+        }
         // console.log(JSON.stringify(body))
         // console.log(batch_url)
         return await this.makeApiPostCall(batch_url, body)
@@ -80,7 +83,7 @@ export class POISearcher {
         if (geom === null) {
             console.log("Geometry not included in the call!")
         }
-        let url = this.getBatchSearchEndpointURL()//(query)
+        let url = this.getGeomSearchEndpointURL(query)
         console.log(parseGeom(geom))
         let g = {
             "geometryList": [
@@ -96,6 +99,27 @@ export class POISearcher {
     }
 
     async searchBatchPois(pois) {
-        
+        let url = this.getBatchSearchEndpointURL()
+        let batchItems = []
+
+        for (let poi of pois) {
+            let geom = poi.reachableRange
+            let g = {
+                "geometryList": [
+                    {
+                        "type": "POLYGON",
+                        "vertices": parseGeom(geom)
+                    }]
+            }
+            batchItems.push({
+                "query": "/geometrySearch/.json?categorySet=7315,9376,7314,9361&limit=100",
+                "post": g
+            })
+        }
+        let body = {
+            json: {"batchItems": batchItems}
+        }
+        // console.log(JSON.stringify(post))
+        return await this.makeApiPostCall(url, body)
     }
 }
