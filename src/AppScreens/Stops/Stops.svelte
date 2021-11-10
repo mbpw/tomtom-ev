@@ -3,12 +3,15 @@
     import Button from "../../Components/Button.svelte";
     import GrayButton from "./GrayButton.svelte";
     import {openedScreen} from "../../stores/appState";
+    import {routesStore} from "../../stores/routesInfo";
 
     import {getContext} from 'svelte';
     import CategorySelectorModal from "./CategorySelectorModal.svelte";
     import {chargingStops} from "../../stores/routesInfo";
     import CircledIcon from "./CircledIcon.svelte";
     import {stopsPreferences} from "../../stores/userInput";
+
+    import {RG} from "../../computing_engine/route-generator";
 
     const {open} = getContext('simple-modal');
 
@@ -24,6 +27,12 @@
     const showSurprise = (slot) => {
         open(CategorySelectorModal, {slot: slot});
     };
+
+    async function prepareRoutes(){
+        let routes = await RG.computeAllRouteOffers(3)
+        console.log(routes)
+        routesStore.set(routes)
+    }
 </script>
 
 
@@ -68,6 +77,7 @@
 
         <Button on:click={() => {
             $openedScreen = 3;
+            prepareRoutes()
         }}>
             Next
         </Button>
