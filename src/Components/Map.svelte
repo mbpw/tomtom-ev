@@ -14,7 +14,8 @@ onMount(() => {
             trafficFlow: true
         },
         center: [21, 52],
-        zoom: 5
+        zoom: 5,
+        attributionControlPosition: 'top-right'
     });
 
     globalMap.set(map)
