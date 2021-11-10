@@ -4,13 +4,25 @@
     import GrayButton from "./GrayButton.svelte";
     import {openedScreen} from "../../stores/appState";
 
-    import { getContext } from 'svelte';
+    import {getContext} from 'svelte';
     import CategorySelectorModal from "./CategorySelectorModal.svelte";
+    import {chargingStops} from "../../stores/routesInfo";
+    import CircledIcon from "./CircledIcon.svelte";
+    import {stopsPreferences} from "../../stores/userInput";
 
-    const { open } = getContext('simple-modal');
+    const {open} = getContext('simple-modal');
 
-    const showSurprise = () => {
-        open(CategorySelectorModal, { slot: 0 });
+    $stopsPreferences = [];
+    for (let i = 0; i < $chargingStops; i++) {
+        $stopsPreferences.push({
+            name: '',
+            option: '',
+            icon: ''
+        })
+    }
+
+    const showSurprise = (slot) => {
+        open(CategorySelectorModal, {slot: slot});
     };
 </script>
 
@@ -22,16 +34,25 @@
     </Header>
 
     <div class="stops_container">
-        <GrayButton on:click={() => {
-            console.log('yay')
-            showSurprise()
-        }}/>
-        <GrayButton/>
-        <GrayButton/>
-        <GrayButton/>
-        <GrayButton/>
-        <GrayButton/>
-        <GrayButton/>
+        {#each $stopsPreferences as slot, i}
+            <GrayButton on:click={() => {
+                console.log('yay')
+                showSurprise(i)
+            }}>
+                {#if slot.icon}
+                    <CircledIcon>
+                        <span slot="icon">
+                            <img src="{slot.icon}" alt="{slot.name}"/>
+                        </span>
+                        <span slot="label">
+                            {slot.option}
+                        </span>
+                    </CircledIcon>
+                {:else}
+                    <CircledIcon/>
+                {/if}
+            </GrayButton>
+        {/each}
     </div>
 
     <Header>

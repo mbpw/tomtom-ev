@@ -4,6 +4,7 @@
     import {categories} from "./categories";
     import OptionButton from "./OptionButton.svelte";
     import {getContext} from "svelte";
+    import {stopsPreferences} from "../../stores/userInput";
 
     const { close } = getContext('simple-modal');
 
@@ -65,6 +66,9 @@
     {#each selectedCategory.options as option}
         <OptionButton on:click={() => {
             console.log(selectedCategory.name + ' ' + option)
+            $stopsPreferences[slot].name = selectedCategory.name;
+            $stopsPreferences[slot].option = option;
+            $stopsPreferences[slot].icon = selectedCategory.icon;
             close();
         }}>
             {option}
