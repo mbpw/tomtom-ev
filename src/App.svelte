@@ -100,6 +100,12 @@
         let lat = element.position.lat
         let lon = element.position.lon
         let poly = await ps.calculateBatchPolygons(ev_stations)
+        let i = 0;
+        for (let element of poly.batchItems) {
+            ev_stations.results[i].reachableRange = element.response.reachableRange.boundary
+            console.log(element.response.reachableRange.boundary)
+            i++
+        }
         //await ps.searchBatchPois(poly...)
         // element.rangePolygon = poly
         // pause(200)

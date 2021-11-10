@@ -71,8 +71,8 @@ export class POISearcher {
         let body = {json:{
                 "batchItems": queries
             }}
-        console.log(JSON.stringify(body))
-        console.log(batch_url)
+        // console.log(JSON.stringify(body))
+        // console.log(batch_url)
         return await this.makeApiPostCall(batch_url, body)
     }
 
