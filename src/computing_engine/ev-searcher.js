@@ -59,8 +59,8 @@ export class EVSearcher {
     }
 
     async batchLatLonSearch(coordinates) {
-        let queries = []
         let url = this.getBatchEndpointURL()
+        let queries = []
         for (let element of coordinates) {
             let url = endpoint_poisearch + "lat=" + element[1] + "&lon=" + element[0] + "&categorySet=7309&limit=1"
             queries.push({"query": url})
