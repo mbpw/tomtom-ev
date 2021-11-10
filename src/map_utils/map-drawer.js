@@ -114,6 +114,23 @@ export class MapDrawer{
         }
     }
 
+    createMarker(icon, color) { //Not Working
+        let markerElement = document.createElement('div');
+        markerElement.className = 'marker';
+        let markerContentElement = document.createElement('div');
+        markerContentElement.className = 'marker-content';
+        markerContentElement.style.backgroundColor = color;
+        markerElement.appendChild(markerContentElement);
+        let iconElement = document.createElement('div');
+        iconElement.className = 'marker-icon';
+        iconElement.style.backgroundImage  =
+            'url(https://api.tomtom.com/maps-sdk-for-web/cdn/static/' + icon + ')';
+        markerContentElement.appendChild(iconElement);
+        // add marker to map
+        return new tt.Marker({element: markerElement, anchor: 'bottom'})
+
+    }
+
     drawEVStationOnMap(coordinates, stationInfo = undefined, removePrevious = true){
         if (removePrevious){
             for (const marker of this.EVStations){
@@ -125,9 +142,11 @@ export class MapDrawer{
             let i = 0
             for (const coordinate of coordinates) {
                 console.log(coordinate)
+                // let marker = this.createMarker('accident.colors-white.svg',"#d20c0c").setDraggable(false).setLngLat(coordinate)
                 let marker = new tt.Marker({
-                    color: "#43d20c"
+                    color: "#43d20c",
                 }).setLngLat(coordinate).setDraggable(false)
+                console.log(marker)
                 marker.addTo(map)
                 if(stationInfo!==undefined) {
                     let popup = new tt.Popup({offset: 40}).setHTML(`<b>Charging Station</b><br/>Name: ${stationInfo[i].chargingParkName}<br />Voltage: ${stationInfo[i].chargingConnectionInfo.chargingVoltageInV}V<br />Current: ${stationInfo[i].chargingConnectionInfo.chargingCurrentInA}A<br />Planned Charging time: ${Math.round(stationInfo[i].chargingTimeInSeconds / 60)}min`);
@@ -215,7 +234,8 @@ export class MapDrawer{
                 }).setLngLat(poi.position).setDraggable(false)
 
                 marker.addTo(map)
-                let popup = new tt.Popup({offset:40}).setHTML(`<b>${this.prettifyCodeName(poi.poi.classifications[0].code)}</b><br/>Name: ${poi.poi.name}<br />Distance from station: ${poi.route[0].summary.lengthInMeters}m<br />Travel time on foot: ${Math.round(poi.route[0].summary.travelTimeInSeconds/60)}min`);
+                let popup = new tt.Popup({offset:40}).setHTML(`<b>${this.prettifyCodeName(poi.poi.classifications[0].code)}</b><br/>Name: ${poi.poi.name}<br />${poi.poi.phone!==undefined?"Phone: "+poi.poi.phone:''}
+Distance from station: ${poi.route[0].summary.lengthInMeters}m<br />Travel time on foot: ${Math.round(poi.route[0].summary.travelTimeInSeconds/60)}min`);
                 marker.setPopup(popup)
                 poi.toggled = false
                 poi.marker = marker
