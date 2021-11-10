@@ -72,12 +72,6 @@
 
     <div class="buttons">
         <Button on:click={() => {
-            $openedScreen = 1;
-        }}>
-            Back
-        </Button>
-
-        <Button on:click={() => {
             $openedScreen = 3;
             prepareRoutes()
         }}>

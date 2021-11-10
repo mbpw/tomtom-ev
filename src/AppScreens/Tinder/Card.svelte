@@ -17,7 +17,7 @@
             </div>
             <div class="info">
                 <img src="./icons/distance.svg" alt="Travel time"/>
-                <p>{route.distance}</p>
+                <p>{Math.floor(route.distance / 1000)} km</p>
             </div>
         </div>
         <div>
