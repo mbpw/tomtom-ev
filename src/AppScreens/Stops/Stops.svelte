@@ -40,7 +40,7 @@
                 showSurprise(i)
             }}>
                 {#if slot.icon}
-                    <CircledIcon green={true}>
+                    <CircledIcon green>
                         <span slot="icon">
                             <img src="{slot.icon}" alt="{slot.name}"/>
                         </span>
@@ -61,14 +61,14 @@
 
     <div class="buttons">
         <Button on:click={() => {
-    $openedScreen = 1;
-}}>
+            $openedScreen = 1;
+        }}>
             Back
         </Button>
 
         <Button on:click={() => {
-    console.log('Pocisk')
-}}>
+            $openedScreen = 3;
+        }}>
             Next
         </Button>
     </div>

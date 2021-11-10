@@ -5,6 +5,7 @@
     import {openedScreen} from "./stores/appState";
     import Stops from "./AppScreens/Stops/Stops.svelte";
     import {Modal} from "svelte-simple-modal";
+    import Tinder from "./AppScreens/Tinder/Tinder.svelte";
 
     const flyInOptions = {x: 200, duration: 200};
     const flyOutOptions = {x: -200, duration: 200};
@@ -20,6 +21,12 @@
     {#if $openedScreen === 2}
         <div in:fly={flyInOptions} out:fly={flyOutOptions}>
             <Stops/>
+        </div>
+    {/if}
+
+    {#if $openedScreen === 3}
+        <div in:fly={flyInOptions} out:fly={flyOutOptions}>
+            <Tinder />
         </div>
     {/if}
 </Modal>

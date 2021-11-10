@@ -41,6 +41,10 @@
     {$endPointStore}
 </MapPointSelectButton>
 
+<MapPointSelectButton>
+    Select car profile
+</MapPointSelectButton>
+
 <Button on:click={() => {
     console.log('Pocisk')
     if($chargingStops)

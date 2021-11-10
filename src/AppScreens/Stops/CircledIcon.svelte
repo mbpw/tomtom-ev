@@ -42,8 +42,7 @@
     }
 
     .green {
-        border: 2px solid $primary;
-        filter: invert(1) sepia(1) saturate(5) hue-rotate(175deg);
+        filter: invert(0) sepia(1) saturate(5) hue-rotate(120deg);
     }
     .green-font {
         color: $primary;

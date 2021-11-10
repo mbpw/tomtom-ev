@@ -56,7 +56,7 @@
     </Header>
 
     <div class="category-icon">
-        <CircledIcon>
+        <CircledIcon green>
             <span slot="icon">
                 <img src="{selectedCategory.icon}" alt="{selectedCategory.name}"/>
             </span>
