@@ -6,17 +6,15 @@
     let time;
 
     $: {
-        time = $startDateStore.toLocaleString([], { hour12: true}).split(' ')[1].substr(0, 5);
-        if(time[time.length - 1] === ':')
-            time = time.substr(0, time.length - 1)
+        time = $startDateStore.toLocaleString([]).split(' ')[1].substr(0, 5);
     }
-    $: ampm = $startDateStore.toLocaleString([], { hour12: true}).split(' ')[2]
+    // $: ampm = $startDateStore.toLocaleString([], { hour12: true}).split(' ')[2]
 </script>
 
 <div class="_background">
     <div class="_label">Start Time</div>
     <div class="_button" on:click={() => {showModal = !showModal}}>
-        {time + ' ' + ampm}
+        {time}
     </div>
 </div>
 

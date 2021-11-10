@@ -36,7 +36,8 @@
         timeClassName: 'modal-time',
         /* Options */
         hasButtons: true,
-        zIndex: 200
+        zIndex: 200,
+        is24h: true
     }
 </script>
 

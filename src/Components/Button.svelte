@@ -14,7 +14,7 @@
     ._button {
         background-color: $primary;
         border-radius: 100px;
-        margin: 30px auto;
+        margin: 10px auto;
         padding: 12px 40px;
 
         transition: all 0.3s ease;

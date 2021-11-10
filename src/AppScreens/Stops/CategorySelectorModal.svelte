@@ -48,7 +48,7 @@
     <div class="_img" on:click={() => {
         selectedCategory = null;
     }}>
-        <img src="./icons/arrow_right.svg" alt="Choose charging stops"/>
+        <img src="./icons/arrow_right.svg" alt="Back"/>
     </div>
 
     <Header>
