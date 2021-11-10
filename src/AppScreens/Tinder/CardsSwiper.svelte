@@ -1,6 +1,8 @@
 <script>
     import Card from "./Card.svelte";
     import {Swiper, SwiperSlide} from 'swiper/svelte';
+    import {MD} from "../../map_utils/map-drawer";
+    import {RG} from "../../computing_engine/route-generator";
 
     import 'swiper/css';
     import {routesStore} from "../../stores/routesInfo";
@@ -10,6 +12,8 @@
     on:activeIndexChange={(e) => {
         const activeRouteIndex = e.detail[0][0].activeIndex;
         console.log(activeRouteIndex);
+        let routeToDraw = RG.offeredRoutes[activeRouteIndex]
+        MD.drawWholeRouteOnMap((routeToDraw))
         // TODO: Tutaj rób coś na mapce przy przewijaniu kart
     }}
 >

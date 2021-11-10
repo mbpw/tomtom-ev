@@ -113,7 +113,7 @@ export class MapDrawer{
         }
     }
 
-    drawEVStationOnMap(coordinates, removePrevious = true){
+    drawEVStationOnMap(coordinates, stationInfo = undefined, removePrevious = true){
         if (removePrevious){
             for (const marker of this.EVStations){
                 marker.remove()
@@ -121,12 +121,18 @@ export class MapDrawer{
             this.EVStations = []
         }
         globalMap.update(map => {
+            let i = 0
             for (const coordinate of coordinates) {
                 console.log(coordinate)
                 let marker = new tt.Marker({
                     color: "#43d20c"
                 }).setLngLat(coordinate).setDraggable(false)
                 marker.addTo(map)
+                if(stationInfo!==undefined) {
+                    let popup = new tt.Popup({offset: 40}).setHTML(`<b>Charging Station</b><br/>Name: ${stationInfo[i].chargingParkName}<br />Voltage: ${stationInfo[i].chargingConnectionInfo.chargingVoltageInV}V<br />Current: ${stationInfo[i].chargingConnectionInfo.chargingCurrentInA}A<br />Planned Charging time: ${Math.round(stationInfo[i].chargingTimeInSeconds / 60)}min`);
+                    marker.setPopup(popup)
+                }
+                i++
                 this.EVStations.push(marker)
         }
             return map
@@ -209,4 +215,50 @@ export class MapDrawer{
             }
         return map})
     }
+
+    drawWholeRouteOnMap(route){
+        let pointsList = []
+        let stationsList = []
+        let stationsCoordsList = []
+        let poisList = []
+        for (const leg of route.routes[0].legs) {
+            for (const point of leg.points) {
+                pointsList.push([point.longitude, point.latitude])
+            }
+            if (leg.summary.chargingInformationAtEndOfLeg!==undefined) {
+                stationsCoordsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
+                stationsList.push(leg.summary.chargingInformationAtEndOfLeg)
+            }
+            if (leg.proposedPoi!==undefined)
+                poisList.push(leg.proposedPoi)
+
+        }
+        console.log(stationsList)
+        console.log('drawing route')
+        this.drawRouteOnMap(pointsList, true, false)
+        console.log('drawing stations')
+        console.log
+        this.drawEVStationOnMap(stationsCoordsList,stationsList)
+        console.log('drawing pois')
+        this.drawPoisOnMap(poisList)
+
+        let startCoords = route.routes[0].legs[0].points.at(0)
+        let stopCoords = route.routes[0].legs.at(-1).points.at(-1)
+        this.drawStartandStopOnMap([startCoords.longitude,startCoords.latitude],[stopCoords.longitude,stopCoords.latitude])
+
+        for (const leg of route.routes[0].legs){
+            console.log(leg)
+            if(leg.proposedPoi !== undefined) {
+                console.log(leg.proposedPoi)
+                let walkPointsList = []
+                for (const point of leg.proposedPoi.route[0].legs[0].points) {
+                    walkPointsList.push([point.longitude, point.latitude])
+                }
+                this.drawWalkRouteOnMap(walkPointsList)
+                walkPointsList = []
+            }
+        }
+    }
 }
+
+export const MD = new MapDrawer()
