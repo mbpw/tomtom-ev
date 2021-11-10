@@ -13,9 +13,9 @@
         // TODO: Tutaj rób coś na mapce przy przewijaniu kart
     }}
 >
-    {#each $routesStore as route}
+    {#each $routesStore as route, i}
         <SwiperSlide>
-            <Card route={route} />
+            <Card route={route} routeIndex={i}/>
         </SwiperSlide>
     {/each}
 </Swiper>

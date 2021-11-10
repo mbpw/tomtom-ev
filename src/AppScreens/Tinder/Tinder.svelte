@@ -1,7 +1,6 @@
 <script>
     import Header from "../../Components/Header.svelte";
     import Map from "../../Components/Map.svelte";
-    import Button from "../../Components/Button.svelte";
 
     import {openedScreen} from "../../stores/appState";
     import CardsSwiper from "./CardsSwiper.svelte";
@@ -15,9 +14,11 @@
         }}>
             <img src="./icons/arrow_right.svg" alt="Choose charging stops"/>
         </div>
-        <Header>
-            Choose your route
-        </Header>
+        <div class="grow">
+            <Header>
+                Choose your route
+            </Header>
+        </div>
     </div>
 
     <Map/>
@@ -26,11 +27,11 @@
         <CardsSwiper/>
     </div>
 
-<!--    <Button on:click={() => {-->
-<!--            $openedScreen = 2;-->
-<!--        }}>-->
-<!--        Back-->
-<!--    </Button>-->
+    <!--    <Button on:click={() => {-->
+    <!--            $openedScreen = 2;-->
+    <!--        }}>-->
+    <!--        Back-->
+    <!--    </Button>-->
 </div>
 
 <style lang="scss">
@@ -47,11 +48,13 @@
         justify-content: space-evenly;
     }
 
+    .grow {
+        flex-grow: 5;
+    }
+
     .cards {
         flex-grow: 4;
     }
-
-
 
     ._back {
         //display: inline-block;
@@ -62,6 +65,7 @@
 
         border-radius: 100px;
         padding: 10px 10px;
+        margin-left: 20px;
         transition: all 0.3s ease;
 
         transform: rotate(180deg);

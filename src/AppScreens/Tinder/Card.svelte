@@ -3,7 +3,7 @@
     import {startDateStore} from "../../stores/userInput";
 
     export let route;
-
+    export let routeIndex;
 </script>
 
 <div class="card">
@@ -30,15 +30,27 @@
     </div>
 
     <div>
-        <div class="stop">
+        <div class="stop"
+             on:click={() => {
+                    // TODO: Zoomowanie na mapie do odpowiedniego markera i popupa
+                    console.log('Pociśnięto START w routcie ' + routeIndex);
+                }}
+        >
             <p class="timestamp">{$startDateStore.toLocaleString([]).split(' ')[1].substr(0, 5)}</p>
             <div>
                 <img src="./icons/stop_dot.svg" alt="Travel time"/>
             </div>
             <p>Start</p>
         </div>
+        <div class="separator"></div>
+
         {#each route.stops as stop, i}
-            <div class="stop">
+            <div class="stop"
+                on:click={() => {
+                    // TODO: Zoomowanie na mapie do odpowiedniego markera i popupa
+                    console.log('Pociśnięto element ' + i + ' w routcie ' + routeIndex);
+                }}
+            >
                 <p class="timestamp">{stop.arrivalTime.substr(11, 5)}</p>
                 <div>
                     <div class="vl"></div>
@@ -46,8 +58,14 @@
                 </div>
                 <p>{stop.name}</p>
             </div>
+            <div class="separator"></div>
         {/each}
-        <div class="stop">
+        <div class="stop"
+             on:click={() => {
+                    // TODO: Zoomowanie na mapie do odpowiedniego markera i popupa
+                    console.log('Pociśnięto END w routcie ' + routeIndex);
+                }}
+        >
             <p class="timestamp">{new Date($startDateStore.getTime() + (route.duration * 1000)).toLocaleString([]).split(' ')[1].substr(0, 5)}</p>
             <div>
                 <img src="./icons/stop_dot.svg" alt="Travel time"/>
@@ -96,6 +114,19 @@
     .stop {
         display: flex;
         justify-content: flex-start;
+        //border-bottom: #000000 solid 1px;
+        transition: all 0.3s ease;
+    }
+    .stop:active {
+        background-color: $darkGray;
+    }
+
+    .separator {
+        background: linear-gradient(90deg, #FFFFFF 10%, #D5D5D5 30%, #FFFFFF 100%);
+        height: 2px;
+        z-index: -10;
+        width: 200px;
+        margin: auto;
     }
 
     .stop > p {
