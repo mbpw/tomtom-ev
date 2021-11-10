@@ -6,7 +6,13 @@
     import {routesStore} from "../../stores/routesInfo";
 </script>
 
-<Swiper class="mySwiper">
+<Swiper class="mySwiper"
+    on:activeIndexChange={(e) => {
+        const activeRouteIndex = e.detail[0][0].activeIndex;
+        console.log(activeRouteIndex);
+        // TODO: Tutaj rób coś na mapce przy przewijaniu kart
+    }}
+>
     {#each $routesStore as route}
         <SwiperSlide>
             <Card route={route} />
