@@ -6,7 +6,7 @@
     import {getContext} from "svelte";
     import {stopsPreferences} from "../../stores/userInput";
 
-    const { close } = getContext('simple-modal');
+    const {close} = getContext('simple-modal');
 
     export let slot;
     let selectedCategory = null;
@@ -33,11 +33,14 @@
         {/each}
 
         <CircledIcon on:click={() => {
-            console.log('yay')
+            $stopsPreferences[slot].name = '';
+            $stopsPreferences[slot].option = '';
+            $stopsPreferences[slot].icon = '';
+            close();
         }}>
-        <span slot="label">
-            Randomize
-        </span>
+            <span slot="label">
+                Randomize
+            </span>
         </CircledIcon>
 
     </div>
@@ -108,9 +111,11 @@
 
         transform: rotate(180deg);
     }
+
     ._img > img {
         margin-left: -4px;
     }
+
     ._img:active {
         background-color: $secondary;
     }

@@ -1,10 +1,17 @@
+<script>
+    export let green = false;
+
+    console.log(green)
+</script>
+
+
 <div class="_parent" on:click>
-    <div class="_circle">
+    <div class="_circle" class:green>
         <slot name="icon">
             <img src="./icons/dice.svg" alt="Random activity"/>
         </slot>
     </div>
-    <div class="_label">
+    <div class="_label" class:green-font={green}>
         <slot name="label">
             Pick a stop
         </slot>
@@ -32,6 +39,14 @@
         margin-top: 5px;
         text-align: center;
         color: $secondary;
+    }
+
+    .green {
+        border: 2px solid $primary;
+        filter: invert(1) sepia(1) saturate(5) hue-rotate(175deg);
+    }
+    .green-font {
+        color: $primary;
     }
 
 </style>

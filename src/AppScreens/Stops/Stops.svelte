@@ -40,7 +40,7 @@
                 showSurprise(i)
             }}>
                 {#if slot.icon}
-                    <CircledIcon>
+                    <CircledIcon green={true}>
                         <span slot="icon">
                             <img src="{slot.icon}" alt="{slot.name}"/>
                         </span>
