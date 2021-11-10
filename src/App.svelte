@@ -12,7 +12,7 @@
   let distance = 0;
   let startPoint = [51.03994, 11.93770]
   let endPoint = [50.10406, 8.62416]
-
+  let routeOffer = undefined
   let routeLayerId = '0'
   let rg = new RouteGenerator();
   let md = new MapDrawer()
@@ -26,48 +26,52 @@
 
   let pointsList = []
   let stationsList = []
+  let toggledPois = []
 
   function pause(milliseconds) {
     var dt = new Date();
     while ((new Date()) - dt <= milliseconds) { /* Do nothing */ }
   }
-  async function compute_route() {
-      let route = await rg.getNextRoute()
-      console.log(route)
-      const optimalTravelTime = rg.optimalRouteTravelTime
-      const actualTravelTime = rg.actualRouteTravelTime
-
-      route_info =  actualTravelTime === optimalTravelTime ? "optimal" : 100 - actualTravelTime/optimalTravelTime
-
-      for (const leg of route.routes[0].legs) {
-          for (const point of leg.points) {
-              pointsList.push([point.longitude, point.latitude])
+  async function zoom_to_popup() {
+      let poi = undefined
+      for (const leg of routeOffer.routes[0].legs) {
+          if (leg.proposedPoi!==undefined && !toggledPois.includes(leg.proposedPoi) ) {
+              poi = leg.proposedPoi
+              toggledPois.push(poi)
+              break
           }
-          stationsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
       }
-      console.log(stationsList)
-      md.drawRouteOnMap(pointsList, true, false)
-      md.drawEVStationOnMap(stationsList)
-      let optimal_pois = await es.batchLatLonSearch(stationsList)
-      for (const poi of optimal_pois.batchItems) {
-          ev_stations.results.push(poi.response.results[0])
-      }
+      console.log(poi)
+      md.zoomAndTogglePoi(poi)
+
   }
 
     async function get_next_route() {
-        let routeOffer = await rg.prepareRouteOffer()
+        md.clearWalkRoutes()
+        routeOffer = await rg.prepareRouteOffer()
         console.log(routeOffer)
         let pointsList = []
         let stationsList = []
+        let poisList = []
         for (const leg of routeOffer.routes[0].legs) {
             for (const point of leg.points) {
                 pointsList.push([point.longitude, point.latitude])
             }
-            stationsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
+            if (leg.summary.chargingInformationAtEndOfLeg!==undefined)
+                stationsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
+            if (leg.proposedPoi!==undefined)
+                poisList.push(leg.proposedPoi)
+
         }
         console.log(stationsList)
         md.drawRouteOnMap(pointsList, true, false)
         md.drawEVStationOnMap(stationsList)
+        md.drawPoisOnMap(poisList)
+
+        let startCoords = routeOffer.routes[0].legs[0].points.at(0)
+        let stopCoords = routeOffer.routes[0].legs.at(-1).points.at(-1)
+        md.drawStartandStopOnMap([startCoords.longitude,startCoords.latitude],[stopCoords.longitude,stopCoords.latitude])
+
         for (const leg of routeOffer.routes[0].legs){
             console.log(leg)
             if(leg.proposedPoi !== undefined) {
@@ -77,7 +81,7 @@
                 for (const point of leg.proposedPoi.route[0].legs[0].points) {
                     walkPointsList.push([point.longitude, point.latitude])
                 }
-        md.drawWalkRouteOnMap(walkPointsList,false)
+        md.drawWalkRouteOnMap(walkPointsList)
                 walkPointsList = []
             }
         }
@@ -156,8 +160,8 @@
         <h1>Hello world!!!</h1>
 
         <p>
-            <button on:click={compute_route}>
-                Compute next optimal route!, time (h) = {route_info}
+            <button on:click={zoom_to_popup}>
+                Zoom to POI popup
             </button>
 
             <button on:click={get_next_route}>

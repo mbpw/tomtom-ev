@@ -22,7 +22,7 @@ export class RouteGenerator {
         this.evStations = ev_stations.results
         for (const station of this.evStations){
             station.visited = false
-            for (const poi of station.pois.results){
+            for (const poi of station.pois){
                 poi.visited = false
             }
         }
@@ -44,6 +44,14 @@ export class RouteGenerator {
         let body = {json: car_params}
         let optimalRoute = await this.makeOptimalRouteApiCall(endpointURL, body)
         this.optimalRoute = optimalRoute
+        for (const leg of this.optimalRoute.routes[0].legs) {
+            if (leg.summary.chargingInformationAtEndOfLeg !== undefined) {
+                const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
+                const station = this.evStations.find(element => element.address.postalCode === postalCode);
+                const index = this.evStations.indexOf(station)
+                this.evStations[index].visited = true
+            }
+        }
         this.optimalRouteTravelTime = optimalRoute.routes[0].summary.travelTimeInSeconds
         this.actualRouteTravelTime = this.optimalRouteTravelTime
         return this.optimalRoute
@@ -57,17 +65,17 @@ export class RouteGenerator {
         for (const leg of this.optimalRoute.routes[0].legs){
             points.push(...leg.points)
         }
-        console.log(points)
         return points
     }
 
     async getNextRoute(){
-        for (const station of this.evStations){
-            station.visited = false
-            for (const poi of station.pois.results){
-                poi.visited = false
-            }
-        }
+        console.log(this.evStations)
+        // for (const station of this.evStations){
+        //     station.visited = false
+        //     for (const poi of station.pois){
+        //         poi.visited = false
+        //     }
+        // }
         if (this.optimalRouteGoodEnough) {
             this.optimalRouteGoodEnough = false
             return await this.computeOptimalRoute()
@@ -101,36 +109,25 @@ export class RouteGenerator {
     async prepareRouteOffer(){
         await this.getNextRoute()
         const POIsOnRoute = []
-        console.log(this.optimalRoute.routes[0].legs)
         for (const leg of this.optimalRoute.routes[0].legs){
             if(leg.summary.chargingInformationAtEndOfLeg !== undefined) {
                 const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
-                console.log(leg.summary.chargingInformationAtEndOfLeg.chargingParkName)
                 const station = this.evStations.find(element => element.address.postalCode === postalCode);
-                console.log(station)
                 if (station !== undefined) {
-                    if (station.pois.results.length > 0) {
+                    if (station.pois.length > 0) {
                         const proposedPOI = await this.selectPOINearStation(station)
-                        console.log(proposedPOI)
                         leg.proposedPoi = proposedPOI
                     }
                 }
             }
         }
-
-        // const firstLeg = this.optimalRoute.routes[0].legs[0] //iterate over all legs later
-        // // const stationName = firstLeg.summary.chargingInformationAtEndOfLeg.chargingParkName //get POI by station name later
-        // const stationName ='Total Schwielowsee Am Bahnhof Lienewitz'
-        // const station = this.evStations.find(element => element.poi.name === stationName);
-        // const proposedPOI = await this.selectPOINearStation(station)
-        // POIsOnRoute.push(proposedPOI)
         return this.optimalRoute
     }
 
     async selectPOINearStation(station){ //POI selection from given station later
-        const POI = station.pois.results.find(element => element.visited === false);
-        const index = station.pois.results.indexOf(POI)
-        station.pois.results[index].visited = true
+        const POI = station.pois.find(element => element.visited === false);
+        const index = station.pois.indexOf(POI)
+        station.pois[index].visited = true
         const POILocation = [POI.position.lat,POI.position.lon]
         const stationLocation = [station.position.lat,station.position.lon]
         const ws = new WalkSimulator(stationLocation,POILocation)
