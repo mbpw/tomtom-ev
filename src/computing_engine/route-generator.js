@@ -19,7 +19,7 @@ export class RouteGenerator {
         for (const POI of this.POIs){
             POI.visited = false
         }
-        this.evStations = ev_stations.results
+        this.evStations = []//ev_stations.results
         for (const station of this.evStations){
             station.visited = false
             for (const poi of station.pois){
@@ -43,7 +43,12 @@ export class RouteGenerator {
         let endpointURL = this.getEndpointURL(this.startPoint[0],this.startPoint[1],this.endPoint[0],this.endPoint[1],this.currentChargeInkWh)
         let body = {json: car_params}
         let optimalRoute = await this.makeOptimalRouteApiCall(endpointURL, body)
-        this.optimalRoute = optimalRoute
+        return this.optimalRoute = optimalRoute
+
+    }
+
+    async markStationsAsVisited(stations){
+        this.evStations = stations
         for (const leg of this.optimalRoute.routes[0].legs) {
             if (leg.summary.chargingInformationAtEndOfLeg !== undefined) {
                 const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
@@ -106,8 +111,9 @@ export class RouteGenerator {
         }
     }
 
-    async prepareRouteOffer(){
-        await this.getNextRoute()
+    async prepareRouteOffer(ev_stations){
+        this.evStations = ev_stations
+        // await this.getNextRoute()
         const POIsOnRoute = []
         for (const leg of this.optimalRoute.routes[0].legs){
             if(leg.summary.chargingInformationAtEndOfLeg !== undefined) {
