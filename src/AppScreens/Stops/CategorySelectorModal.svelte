@@ -14,7 +14,7 @@
 
 {#if !selectedCategory}
 
-    <Header>
+    <Header backButton={false}>
         Category
     </Header>
 
@@ -51,7 +51,7 @@
         <img src="./icons/arrow_right.svg" alt="Back"/>
     </div>
 
-    <Header>
+    <Header backButton={false}>
         {selectedCategory.name}
     </Header>
 

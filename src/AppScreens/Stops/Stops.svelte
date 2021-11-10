@@ -66,7 +66,7 @@
         {/each}
     </div>
 
-    <Header>
+    <Header backButton={false}>
         ... or get a lucky break
     </Header>
 

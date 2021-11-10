@@ -26,7 +26,7 @@
 
 <style>
     :global(.swiper) {
-        /*transform: translateY(-15px);*/
+        transform: translateY(-40px);
     }
 
     :global(.swiper-slide) {
