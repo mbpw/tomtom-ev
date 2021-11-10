@@ -16,6 +16,7 @@ onMount(() => {
         center: [21, 52],
         zoom: 5
     });
+
     globalMap.set(map)
 });
 

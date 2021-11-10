@@ -12,13 +12,13 @@ export class WalkSimulator {
     }
 
     async askForRoute(endpoint){
-        console.log(endpoint)
+
         return await Promise.resolve(ky.get(endpoint).json())
     }
 
     async computeWalkRoute(){
         let route = await this.askForRoute(this.getEndpointURL())
-        console.log(route)
+
         return route.routes
     }
 

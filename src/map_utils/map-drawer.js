@@ -6,6 +6,10 @@ export class MapDrawer{
         this.routeLayerId = '0'
         this.walkRouteIds = []
         this.EVStations = []
+        this.Pois = []
+        this.experimentalPoi = undefined
+        this.startPoint = undefined
+        this.endPoint = undefined
     }
     drawRouteOnMap(coordinates, removePrevious = true, moveCamera = true){
         globalMap.update(map => {
@@ -14,6 +18,7 @@ export class MapDrawer{
                 map.removeLayer(this.routeLayerId)
             }
             this.routeLayerId = (this.giveRandomId(1,10000)).toString()
+            console.log('ROUTE ID: ' + this.routeLayerId)
             map.addLayer({
                 id: this.routeLayerId,
                 type: "line",
@@ -57,16 +62,11 @@ export class MapDrawer{
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    drawWalkRouteOnMap(coordinates, removePrevious = true, moveCamera = true){
+    drawWalkRouteOnMap(coordinates){
         globalMap.update(map => {
             console.log(map)
-            if (this.walkRouteIds!==[] && removePrevious) {
-                for (const route in this.walkRouteIds) {
-                    map.removeLayer(route)
-                }
-                this.walkRouteIds = []
-            }
             this.walkRouteIds.push((this.giveRandomId(10000,100000)).toString())
+            console.log('ROUTE ID: ' + this.walkRouteIds.at(-1))
             map.addLayer({
                 id: this.walkRouteIds.at(-1),
                 type: "line",
@@ -96,12 +96,21 @@ export class MapDrawer{
                     "line-width": 2
                 }
             })
-            if(moveCamera) {
-                map.setCenter(coordinates[0]);
-                map.setZoom(10);
-            }
             return map
         });
+    }
+
+    clearWalkRoutes(){
+        if (this.walkRouteIds!==[]) {
+            globalMap.update(map => {
+                for (const route of this.walkRouteIds) {
+                    console.log(route)
+                    map.removeLayer(route)
+                }
+                this.walkRouteIds = []
+                return map
+            })
+        }
     }
 
     drawEVStationOnMap(coordinates, removePrevious = true){
@@ -114,10 +123,76 @@ export class MapDrawer{
         globalMap.update(map => {
             for (const coordinate of coordinates) {
                 console.log(coordinate)
-                let marker = new tt.Marker().setLngLat(coordinate).setDraggable(false)
+                let marker = new tt.Marker({
+                    color: "#43d20c"
+                }).setLngLat(coordinate).setDraggable(false)
                 marker.addTo(map)
                 this.EVStations.push(marker)
         }
+            return map
+        })
+    }
+
+    prettifyCodeName(string)
+    {
+        return (string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()).replace('_',' ');
+    }
+    zoomAndTogglePoi(poi){
+        for(const markerPoi of this.Pois){
+            if(markerPoi.toggled){
+                markerPoi.marker.togglePopup()
+                markerPoi.toggled=false
+            }
+        }
+        globalMap.update(map => {
+            let poiMarker = this.Pois.find(poiMarker=>poiMarker.id===poi.id)
+            poiMarker.marker.togglePopup()
+            poiMarker.toggled=true
+            map.setCenter(poiMarker.marker.getLngLat());
+            map.setZoom(16);
+            return map
+        })}
+
+    drawPoisOnMap(pois, removePrevious = true){
+        if (removePrevious){
+            for (const poi of this.Pois){
+                poi.marker.remove()
+            }
+            this.Pois = []
+        }
+        globalMap.update(map => {
+            for (const poi of pois) {
+                let marker = new tt.Marker({
+                    color: "#186bbd"
+                }).setLngLat(poi.position).setDraggable(false)
+
+                marker.addTo(map)
+                let popup = new tt.Popup({offset:40}).setHTML(`<b>${this.prettifyCodeName(poi.poi.classifications[0].code)}</b><br/>Name: ${poi.poi.name}<br />Distance from station: ${poi.route[0].summary.lengthInMeters}m<br />Travel time on foot: ${Math.round(poi.route[0].summary.travelTimeInSeconds/60)}min`);
+                marker.setPopup(popup)
+                poi.toggled = false
+                poi.marker = marker
+                this.Pois.push(poi)
+            }
+            return map
+        })}
+
+    drawStartandStopOnMap(startCoordinates, stopCoordinates){
+        if(this.startPoint!== undefined) {
+            this.startPoint.remove()
+            this.endPoint.remove()
+        }
+        globalMap.update(map => {
+
+            this.startPoint = new tt.Marker({
+                color: "#000000"
+            }).setLngLat(startCoordinates).setDraggable(false)
+            this.startPoint.addTo(map)
+
+            this.endPoint = new tt.Marker({
+                color: "#ffffff"
+            }).setLngLat(stopCoordinates).setDraggable(false)
+            this.endPoint.addTo(map)
+
             return map
         })}
 
