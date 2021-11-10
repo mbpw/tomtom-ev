@@ -1,6 +1,8 @@
 <script>
     import Button from "../../Components/Button.svelte";
     import {startDateStore} from "../../stores/userInput";
+    import {RG} from "../../computing_engine/route-generator";
+    import {MD} from "../../map_utils/map-drawer";
 
     export let route;
     export let routeIndex;
@@ -48,6 +50,10 @@
             <div class="stop"
                 on:click={() => {
                     // TODO: Zoomowanie na mapie do odpowiedniego markera i popupa
+                    let poi = RG.offeredRoutes[routeIndex].routes[0].legs[i].proposedPoi
+                    if (poi !== undefined){
+                        MD.zoomAndTogglePoi(poi)
+                    }
                     console.log('Pociśnięto element ' + i + ' w routcie ' + routeIndex);
                 }}
             >

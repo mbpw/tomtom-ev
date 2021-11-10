@@ -49,8 +49,10 @@ export class MapDrawer{
                 }
             })
             if(moveCamera) {
-                map.setCenter(coordinates[0]);
-                map.setZoom(10);
+                // map.setCenter(coordinates[Math.ceil(coordinates.length/2)]);
+                // map.setZoom(7);
+                let routeCenter = new tt.LngLat(coordinates[Math.ceil(coordinates.length/2)][0],coordinates[Math.ceil(coordinates.length/2)][1])
+                requestAnimationFrame(timestamp => this.zoomToPointAnimate(timestamp,window.performance.now(),2500,8, map.getZoom(),routeCenter,map.getCenter(),map));
             }
             return map
         });
@@ -143,6 +145,29 @@ export class MapDrawer{
     {
         return (string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()).replace('_',' ');
     }
+
+    zoomToPointAnimate(timestamp,startTimestamp,duration, zoom,initZoom,location,initLocation, map){
+        console.log(timestamp)
+        let currDuration = timestamp-startTimestamp
+        if(currDuration < duration) {
+            let actualZoom = undefined
+            if(zoom > initZoom)
+                actualZoom = initZoom-(initZoom-zoom)*(currDuration/duration)
+            else
+                actualZoom = initZoom+(zoom-initZoom)*(currDuration/duration)
+            let lonDiff = location.lng-initLocation.lng
+            let latDiff = location.lat-initLocation.lat
+            let dist = Math.sqrt(lonDiff*lonDiff+latDiff*latDiff)
+            let frac = (currDuration/duration)*dist
+            let actualLon = initLocation.lng+lonDiff*(frac/dist)
+            let actualLat = initLocation.lat+latDiff*(frac/dist)
+            map.setCenter([actualLon,actualLat]);
+            console.log(actualZoom)
+            map.setZoom(actualZoom);
+            requestAnimationFrame(timestamp => this.zoomToPointAnimate(timestamp, startTimestamp,duration,zoom, initZoom,location,initLocation, map));
+        }
+    }
+
     zoomAndTogglePoi(poi){
         for(const markerPoi of this.Pois){
             if(markerPoi.toggled){
@@ -154,8 +179,7 @@ export class MapDrawer{
             let poiMarker = this.Pois.find(poiMarker=>poiMarker.id===poi.id)
             poiMarker.marker.togglePopup()
             poiMarker.toggled=true
-            map.setCenter(poiMarker.marker.getLngLat());
-            map.setZoom(16);
+            requestAnimationFrame(timestamp => this.zoomToPointAnimate(timestamp,window.performance.now(),2500,15, map.getZoom(),poiMarker.marker.getLngLat(),map.getCenter(),map));
             return map
         })}
 
@@ -235,7 +259,7 @@ export class MapDrawer{
         }
         console.log(stationsList)
         console.log('drawing route')
-        this.drawRouteOnMap(pointsList, true, false)
+        this.drawRouteOnMap(pointsList, true, true)
         console.log('drawing stations')
         console.log
         this.drawEVStationOnMap(stationsCoordsList,stationsList)
