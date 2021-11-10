@@ -95,7 +95,7 @@ export class RouteGenerator {
 
     async prepareRouteOffer(ev_stations) {
         this.evStations = ev_stations.results
-        // await this.getNextRoute()
+        await this.getNextRoute()
         const POIsOnRoute = []
         for (const leg of this.optimalRoute.routes[0].legs) {
             if (leg.summary.chargingInformationAtEndOfLeg !== undefined) {
