@@ -8,8 +8,10 @@ const key = 'KSiA3cYn3i5bjlooe5NlxW5tR5uF0t7P';
 
 
 
+
 export class RouteGenerator {
-    constructor(startPoint = [52.32563573919947, 10.523825676170611], endPoint = [52.509548827862005, 13.62762775333342], constantSpeedConsumptionInkWhPerHundredkm ="32,10.87:77,18.01", currentChargeInkWh=20, maxChargeInkWh=40, minChargeAtDestinationInkWh=4,minChargeAtChargingStopsInkWh=4, POIs = null, evStations = null) {
+    constructor(startPoint = [52.32563573919947, 10.523825676170611], endPoint = [52.509548827862005, 13.62762775333342], constantSpeedConsumptionInkWhPerHundredkm = "32,10.87:77,18.01", currentChargeInkWh = 20, maxChargeInkWh = 40, minChargeAtDestinationInkWh = 4, minChargeAtChargingStopsInkWh = 4, POIs = null, evStations = null) {
+        this.randomCounter = 0;
         this.startPoint = startPoint
         this.endPoint = endPoint
         this.constantSpeedConsumptionInkWhPerHundredkm = constantSpeedConsumptionInkWhPerHundredkm
@@ -19,64 +21,69 @@ export class RouteGenerator {
         this.minChargeAtChargingStopsInkWh = minChargeAtChargingStopsInkWh
         this.optimalRouteGoodEnough = true
         this.POIs = []//pois_in_city.results
-        for (const POI of this.POIs){
+        for (const POI of this.POIs) {
             POI.visited = false
         }
-        this.evStations = ev_stations.results
-        for (const station of this.evStations){
-            station.visited = false
-            for (const poi of station.pois){
-                poi.visited = false
-            }
-        }
+        this.evStations = []//ev_stations.results
+
         this.optimalRoute = null
         this.optimalRouteTravelTime = 0
         this.actualRouteTravelTime = 0
         this.offeredRoutes = []
     }
-    getEndpointURL(start_x, start_y, stop_x, stop_y, currentCharge){
-        return endpoint + start_x+','+start_y+':'+stop_x+','+stop_y+'/json?key='+key+'&vehicleEngineType='+vehicleEngineType+'&constantSpeedConsumptionInkWhPerHundredkm='+this.constantSpeedConsumptionInkWhPerHundredkm+'&currentChargeInkWh='+currentCharge+'&maxChargeInkWh='+this.maxChargeInkWh+'&minChargeAtDestinationInkWh='+this.minChargeAtDestinationInkWh+'&minChargeAtChargingStopsInkWh='+this.minChargeAtChargingStopsInkWh
+
+    getEndpointURL(start_x, start_y, stop_x, stop_y, currentCharge) {
+        return endpoint + start_x + ',' + start_y + ':' + stop_x + ',' + stop_y + '/json?key=' + key + '&vehicleEngineType=' + vehicleEngineType + '&constantSpeedConsumptionInkWhPerHundredkm=' + this.constantSpeedConsumptionInkWhPerHundredkm + '&currentChargeInkWh=' + currentCharge + '&maxChargeInkWh=' + this.maxChargeInkWh + '&minChargeAtDestinationInkWh=' + this.minChargeAtDestinationInkWh + '&minChargeAtChargingStopsInkWh=' + this.minChargeAtChargingStopsInkWh
     }
 
-    async makeOptimalRouteApiCall(endpoint, body){
+    async makeOptimalRouteApiCall(endpoint, body) {
         console.log(endpoint)
         return await Promise.resolve(ky.post(endpoint, body).json())
     }
 
-    async computeOptimalRoute(){
-        let endpointURL = this.getEndpointURL(this.startPoint[0],this.startPoint[1],this.endPoint[0],this.endPoint[1],this.currentChargeInkWh)
+    async computeOptimalRoute() {
+        let endpointURL = this.getEndpointURL(this.startPoint[0], this.startPoint[1], this.endPoint[0], this.endPoint[1], this.currentChargeInkWh)
         let body = {json: car_params}
         let optimalRoute = await this.makeOptimalRouteApiCall(endpointURL, body)
-        this.optimalRoute = optimalRoute
-        console.log(this.optimalRoute.routes[0].legs)
-        for (const leg of this.optimalRoute.routes[0].legs) {
-            if (leg.summary.chargingInformationAtEndOfLeg !== undefined) {
-                const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
-                const station = this.evStations.find(element => element.address.postalCode === postalCode);
-                if (station !== undefined) {
-                    const index = this.evStations.indexOf(station)
-                    console.log(postalCode)
-                    this.evStations[index].visited = true
-                }
-            }
-        }
-        this.optimalRouteTravelTime = optimalRoute.routes[0].summary.travelTimeInSeconds
-        this.actualRouteTravelTime = this.optimalRouteTravelTime
-        return this.optimalRoute
+        return this.optimalRoute = optimalRoute
+
     }
 
-    async getPointsOfOptimalRoute(){
-        if (this.optimalRoute == null){
+    // async computeOptimalRoute() {
+    //     let endpointURL = this.getEndpointURL(this.startPoint[0], this.startPoint[1], this.endPoint[0], this.endPoint[1], this.currentChargeInkWh)
+    //     let body = {json: car_params}
+    //     let optimalRoute = await this.makeOptimalRouteApiCall(endpointURL, body)
+    //     this.optimalRoute = optimalRoute
+    //     console.log(this.optimalRoute.routes[0].legs)
+    //     for (const leg of this.optimalRoute.routes[0].legs) {
+    //         if (leg.summary.chargingInformationAtEndOfLeg !== undefined) {
+    //             const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
+    //             const station = this.evStations.find(element => element.address.postalCode === postalCode);
+    //             if (station !== undefined) {
+    //                 const index = this.evStations.indexOf(station)
+    //                 console.log(postalCode)
+    //                 this.evStations[index].visited = true
+    //             }
+    //         }
+    //     }
+    //     this.optimalRouteTravelTime = optimalRoute.routes[0].summary.travelTimeInSeconds
+    //     this.actualRouteTravelTime = this.optimalRouteTravelTime
+    //     return this.optimalRoute
+    // }
+
+
+    async getPointsOfOptimalRoute() {
+        if (this.optimalRoute == null) {
             this.computeOptimalRoute()
         }
         const points = []
-        for (const leg of this.optimalRoute.routes[0].legs){
+        for (const leg of this.optimalRoute.routes[0].legs) {
             points.push(...leg.points)
         }
         return points
     }
 
-    async getNextRoute(){
+    async getNextRoute() {
         console.log(this.evStations)
         // for (const station of this.evStations){
         //     station.visited = false
@@ -87,23 +94,21 @@ export class RouteGenerator {
         if (this.optimalRouteGoodEnough) {
             this.optimalRouteGoodEnough = false
             return await this.computeOptimalRoute()
-        }
-        else
-        {
+        } else {
             let station = this.evStations.find(element => element.visited === false);
-            if (station === undefined){
-                for (const station of this.evStations){
+            if (station === undefined) {
+                for (const station of this.evStations) {
                     station.visited = false
                 }
                 station = this.evStations.find(element => element.visited === false);
             }
             const index = this.evStations.indexOf(station)
             this.evStations[index].visited = true
-            const newStationLocation = [station.position.lat,station.position.lon]
-            const endpointURLFirst = this.getEndpointURL(this.startPoint[0],this.startPoint[1],newStationLocation[0],newStationLocation[1],this.currentChargeInkWh)
+            const newStationLocation = [station.position.lat, station.position.lon]
+            const endpointURLFirst = this.getEndpointURL(this.startPoint[0], this.startPoint[1], newStationLocation[0], newStationLocation[1], this.currentChargeInkWh)
             let body = {json: car_params}
             let optimalRouteFirst = await this.makeOptimalRouteApiCall(endpointURLFirst, body)
-            const endpointURLSecond = this.getEndpointURL(newStationLocation[0],newStationLocation[1],this.endPoint[0],this.endPoint[1],this.maxChargeInkWh)
+            const endpointURLSecond = this.getEndpointURL(newStationLocation[0], newStationLocation[1], this.endPoint[0], this.endPoint[1], this.maxChargeInkWh)
             let optimalRouteSecond = await this.makeOptimalRouteApiCall(endpointURLSecond, body)
             this.optimalRoute = optimalRouteFirst
             this.optimalRoute.routes[0].summary.lengthInMeters += optimalRouteSecond.routes[0].summary.lengthInMeters
@@ -114,13 +119,15 @@ export class RouteGenerator {
         }
     }
 
-    async prepareRouteOffer(){
+    async prepareRouteOffer(ev_stations) {
+        this.evStations = ev_stations.results
         await this.getNextRoute()
         const POIsOnRoute = []
-        for (const leg of this.optimalRoute.routes[0].legs){
-            if(leg.summary.chargingInformationAtEndOfLeg !== undefined) {
+        for (const leg of this.optimalRoute.routes[0].legs) {
+            if (leg.summary.chargingInformationAtEndOfLeg !== undefined) {
                 const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
                 const station = this.evStations.find(element => element.address.postalCode === postalCode);
+
                 if (station !== undefined) {
                     if (station.pois.length > 0) {
                         const proposedPOI = await this.selectPOINearStation(station)
@@ -132,16 +139,22 @@ export class RouteGenerator {
         return this.optimalRoute
     }
 
-    async selectPOINearStation(station){ //POI selection from given station later
-        const POI = station.pois.find(element => element.visited === false);
+    async selectPOINearStation(station) { //POI selection from given station later
+        // const POI = station.pois.find(element => element.visited === false);
+        const POI = station.pois[this.randomCounter++]
+        console.log(station)
+        console.log(POI)
         const index = station.pois.indexOf(POI)
-        station.pois[index].visited = true
-        const POILocation = [POI.position.lat,POI.position.lon]
-        const stationLocation = [station.position.lat,station.position.lon]
-        const ws = new WalkSimulator(stationLocation,POILocation)
-        const route = await ws.computeWalkRoute()
+        console.log(index)
+        if (index != -1) {
+            station.pois[index].visited = true
+            const POILocation = [POI.position.lat, POI.position.lon]
+            const stationLocation = [station.position.lat, station.position.lon]
+            const ws = new WalkSimulator(stationLocation, POILocation)
+            const route = await ws.computeWalkRoute()
 
-        POI.route = route
+            POI.route = route
+        }
         return POI
     }
     prettifyCodeName(string)
@@ -149,6 +162,32 @@ export class RouteGenerator {
         return (string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()).replace('_',' ');
     }
 
+    async markStationsAsVisited(stations) {
+        this.evStations = stations
+        for (const leg of this.optimalRoute.routes[0].legs) {
+            if (leg.summary.chargingInformationAtEndOfLeg !== undefined) {
+                const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
+                const station = this.evStations.find(element => element.address.postalCode === postalCode);
+                const index = this.evStations.indexOf(station)
+                this.evStations[index].visited = true
+            }
+        }
+        this.optimalRouteTravelTime = this.optimalRoute.routes[0].summary.travelTimeInSeconds
+        this.actualRouteTravelTime = this.optimalRouteTravelTime
+        return this.optimalRoute
+    }
+
+
+    async markPoisAsNotVisited() {
+        console.log(this.evStations)
+        for (let station of this.evStations) {
+            station.visited = false
+            for (let poi of station.pois) {
+                poi.visited = false
+            }
+        }
+        return this.evStations
+    }
     createInfoSummary(routes){
         let infoSummary = []
         console.log(routes)
