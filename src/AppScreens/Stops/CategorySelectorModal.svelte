@@ -68,13 +68,13 @@
 
     {#each selectedCategory.options as option}
         <OptionButton on:click={() => {
-            console.log(selectedCategory.name + ' ' + option)
+            console.log(selectedCategory.name + ' ' + option.name)
             $stopsPreferences[slot].name = selectedCategory.name;
-            $stopsPreferences[slot].option = option;
+            $stopsPreferences[slot].option = option.name;
             $stopsPreferences[slot].icon = selectedCategory.icon;
             close();
         }}>
-            {option}
+            {option.name}
         </OptionButton>
     {/each}
 
