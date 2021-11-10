@@ -3,6 +3,7 @@
     import {startDateStore} from "../../stores/userInput";
 
     export let route;
+
 </script>
 
 <div class="card">
@@ -10,7 +11,7 @@
         <div class="infos">
             <div class="info">
                 <img src="./icons/clock.svg" alt="Travel time"/>
-                <p>{route.duration}</p>
+                <p>{Math.floor(route.duration / 60 / 60)}h {Math.floor(route.duration % 3600 / 60)}m</p>
             </div>
             <div class="info">
                 <img src="./icons/distance.svg" alt="Travel time"/>
@@ -38,7 +39,7 @@
         </div>
         {#each route.stops as stop, i}
             <div class="stop">
-                <p class="timestamp">{stop.arrivalTime}</p>
+                <p class="timestamp">{stop.arrivalTime.substr(11, 5)}</p>
                 <div>
                     <div class="vl"></div>
                     <img src="./icons/stop_dot.svg" alt="Travel time"/>
@@ -47,7 +48,7 @@
             </div>
         {/each}
         <div class="stop">
-            <p class="timestamp">{($startDateStore).toLocaleString([]).split(' ')[1].substr(0, 5)}</p>
+            <p class="timestamp">{new Date($startDateStore.getTime() + (route.duration * 1000)).toLocaleString([]).split(' ')[1].substr(0, 5)}</p>
             <div>
                 <img src="./icons/stop_dot.svg" alt="Travel time"/>
             </div>
