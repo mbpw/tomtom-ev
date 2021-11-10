@@ -147,7 +147,6 @@ export class MapDrawer{
     }
 
     zoomToPointAnimate(timestamp,startTimestamp,duration, zoom,initZoom,location,initLocation, map){
-        console.log(timestamp)
         let currDuration = timestamp-startTimestamp
         if(currDuration < duration) {
             let actualZoom = undefined
@@ -162,7 +161,6 @@ export class MapDrawer{
             let actualLon = initLocation.lng+lonDiff*(frac/dist)
             let actualLat = initLocation.lat+latDiff*(frac/dist)
             map.setCenter([actualLon,actualLat]);
-            console.log(actualZoom)
             map.setZoom(actualZoom);
             requestAnimationFrame(timestamp => this.zoomToPointAnimate(timestamp, startTimestamp,duration,zoom, initZoom,location,initLocation, map));
         }
@@ -180,6 +178,18 @@ export class MapDrawer{
             poiMarker.marker.togglePopup()
             poiMarker.toggled=true
             requestAnimationFrame(timestamp => this.zoomToPointAnimate(timestamp,window.performance.now(),2500,15, map.getZoom(),poiMarker.marker.getLngLat(),map.getCenter(),map));
+            return map
+        })}
+
+    zoomStart(){
+        globalMap.update(map => {
+            requestAnimationFrame(timestamp => this.zoomToPointAnimate(timestamp,window.performance.now(),2500,15, map.getZoom(),this.startPoint.getLngLat(),map.getCenter(),map));
+            return map
+        })}
+
+    zoomEnd(){
+        globalMap.update(map => {
+            requestAnimationFrame(timestamp => this.zoomToPointAnimate(timestamp,window.performance.now(),2500,15, map.getZoom(),this.endPoint.getLngLat(),map.getCenter(),map));
             return map
         })}
 
@@ -245,6 +255,7 @@ export class MapDrawer{
         let stationsList = []
         let stationsCoordsList = []
         let poisList = []
+        this.clearWalkRoutes()
         for (const leg of route.routes[0].legs) {
             for (const point of leg.points) {
                 pointsList.push([point.longitude, point.latitude])

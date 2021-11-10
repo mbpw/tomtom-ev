@@ -35,6 +35,7 @@
         <div class="stop"
              on:click={() => {
                     // TODO: Zoomowanie na mapie do odpowiedniego markera i popupa
+                    MD.zoomStart()
                     console.log('Pociśnięto START w routcie ' + routeIndex);
                 }}
         >
@@ -69,6 +70,7 @@
         <div class="stop"
              on:click={() => {
                     // TODO: Zoomowanie na mapie do odpowiedniego markera i popupa
+                    MD.zoomEnd()
                     console.log('Pociśnięto END w routcie ' + routeIndex);
                 }}
         >
