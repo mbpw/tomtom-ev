@@ -24,22 +24,25 @@
 <div>
     <div class="stop"
          on:click={() => {
-                    console.log('Pociśnięto START w routcie ' + $selectedRouteIndex);
                 }}
     >
         <p class="timestamp">{$startDateStore.toLocaleString([]).split(' ')[1].substr(0, 5)}</p>
         <div>
             <img src="./icons/stop_dot.svg" alt="Travel time"/>
         </div>
-        <p>Start</p>
+        <p class="stop-title">Start</p>
+        <div class="navigate" on:click={() => {
+                console.log(route)
+                window.open('geo:50,10', '_blank').focus();
+            }}>
+            <img src="./icons/navigate.svg" alt="gps"/>
+        </div>
     </div>
-    <div class="separator"></div>
+    <!--    <div class="separator"></div>-->
 
     {#each route.stops as stop, i}
         <div class="stop"
              on:click={() => {
-                    console.log($routesStore)
-                    console.log('Pociśnięto element ' + i + ' w routcie ' + $selectedRouteIndex);
                 }}
         >
             <p class="timestamp">{stop.arrivalTime.substr(11, 5)}</p>
@@ -47,9 +50,15 @@
                 <div class="vl"></div>
                 <img src="./icons/stop_dot.svg" alt="Travel time"/>
             </div>
-            <p>{stop.name}</p>
+            <p class="stop-title">{stop.name}</p>
+            <div class="navigate" on:click={() => {
+                console.log(route)
+                window.open('geo:50,10', '_blank').focus();
+            }}>
+                <img src="./icons/navigate.svg" alt="gps"/>
+            </div>
         </div>
-        <div class="separator"></div>
+        <!--        <div class="separator"></div>-->
     {/each}
     <div class="stop"
          on:click={() => {
@@ -59,7 +68,13 @@
         <div>
             <img src="./icons/stop_dot.svg" alt="Travel time"/>
         </div>
-        <p>End</p>
+        <p class="stop-title">End</p>
+        <div class="navigate" on:click={() => {
+                console.log(route)
+                window.open('geo:50,10', '_blank').focus();
+            }}>
+            <img src="./icons/navigate.svg" alt="gps"/>
+        </div>
     </div>
 </div>
 
@@ -70,23 +85,48 @@
         justify-content: space-evenly;
         margin: 10px 50px;
     }
+
     .info {
         display: flex;
     }
+
     .info > p {
         margin: 5px 10px;
         color: $primary;
         font-weight: bold;
     }
 
+    .navigate {
+        height: 25px;
+        width: 25px;
+        display: inline-block;
+
+        background-color: $primary;
+        border-radius: 100px;
+        padding: 10px 12px 15px;
+        transition: all 0.3s ease;
+
+    }
+
+    .navigate:active {
+        background-color: $darkGray;
+    }
+
+    .navigate > img {
+        width: 25px;
+        margin-bottom: 5px;
+    }
+
     .stop {
         display: flex;
         justify-content: flex-start;
+        background: $gray;
+        border-radius: 100px;
+        margin: 10px;
+        padding: 15px 30px;
+        color: $secondary;
         //border-bottom: #000000 solid 1px;
         transition: all 0.3s ease;
-    }
-    .stop:active {
-        background-color: $darkGray;
     }
 
     .separator {
@@ -101,6 +141,10 @@
         margin: 5px 5px;
         //color: $primary;
         //font-weight: bold;
+    }
+
+    .stop-title {
+        flex-grow: 5;
     }
 
     //noinspection CssInvalidPropertyValue
