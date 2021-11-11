@@ -25,7 +25,7 @@
     </div>
 
     <div class="map">
-        <Map/>
+        <Map size2={true}/>
     </div>
 
     <div>

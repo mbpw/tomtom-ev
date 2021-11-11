@@ -5,6 +5,8 @@ import {globalMap} from "../store";
 import { onMount } from "svelte";
 let map
 let mapElement
+export let size2 = false;
+
 onMount(() => {
     map = tt.map({
         key: "KSiA3cYn3i5bjlooe5NlxW5tR5uF0t7P",
@@ -24,12 +26,15 @@ onMount(() => {
 
 </script>
 
-<div class="map" bind:this={mapElement}></div>
+<div class="map" class:size2 bind:this={mapElement}></div>
 
 <style>
     .map {
         width:100%;
         height:400px
+    }
+    .size2 {
+        height: 600px;
     }
     button {
         margin-top: 2rem;
