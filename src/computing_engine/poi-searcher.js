@@ -1,4 +1,5 @@
 import ky from 'ky';
+import {all_categories_ids} from "../AppScreens/Stops/categories";
 
 const endpoint_range = 'https://api.tomtom.com/routing/1/calculateReachableRange/';
 const endpoint_search = 'https://api.tomtom.com/search/2/geometrySearch/';
@@ -112,14 +113,14 @@ export class POISearcher {
                     }]
             }
             batchItems.push({
-                "query": "/geometrySearch/.json?categorySet=7315,9376,7314,9361&limit=100",
+                "query": "/geometrySearch/.json?categorySet=" + all_categories_ids + "&limit=100",
                 "post": g
             })
         }
         let body = {
             json: {"batchItems": batchItems}
         }
-        // console.log(JSON.stringify(post))
+        console.log("/geometrySearch/.json?categorySet=" + all_categories_ids + "&limit=100")
         let found = await this.makeApiPostCall(url, body)
         // for(let poi of found)
         return found
