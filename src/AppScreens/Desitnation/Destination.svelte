@@ -16,6 +16,11 @@
 
     const {open} = getContext('simple-modal');
 
+    function initCarParams(){
+        console.log($carProfileStore)
+        RG.initCarParams($carProfileStore.params,$carProfileStore.body)
+    }
+
     async function computeChargingStopsNumber(){
         $chargingStops = await RG.computeOptimalRouteSize($startPointStore.latlng,$endPointStore.latlng)
     }
@@ -69,6 +74,7 @@
         $chargingStops = 0;
     else
         $chargingStops = 4;
+    initCarParams()
     computeChargingStopsNumber()
 
 }}>
