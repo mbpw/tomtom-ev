@@ -71,6 +71,7 @@
             console.log(selectedCategory.name + ' ' + option.name)
             $stopsPreferences[slot].name = selectedCategory.name;
             $stopsPreferences[slot].option = option.name;
+            $stopsPreferences[slot].category_id = option.category_id;
             $stopsPreferences[slot].icon = selectedCategory.icon;
             close();
         }}>
