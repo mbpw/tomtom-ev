@@ -39,9 +39,9 @@
         await RG.generateStationsObject($startPointStore.latlng,$endPointStore.latlng,$stopsPreferences)
         let routes = await RG.computeAllRouteOffers(3)
         console.log(routes)
-        routesStore.set(routes)
-        console.log(RG.offeredRoutes)
-        MD.drawWholeRouteOnMap(RG.offeredRoutes[0])
+        // routesStore.set(routes)
+        // console.log(RG.offeredRoutes)
+        // MD.drawWholeRouteOnMap(RG.offeredRoutes[0])
     }
 </script>
 
