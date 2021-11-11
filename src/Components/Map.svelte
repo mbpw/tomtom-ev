@@ -5,6 +5,7 @@ import {globalMap} from "../store";
 import {selectedRouteIndex} from "../stores/routesInfo";
 import {MD} from "../map_utils/map-drawer";
 import {RG} from "../computing_engine/route-generator";
+import {loadingStatus} from "../stores/appState";
 import { onMount } from "svelte";
 let map
 let mapElement
@@ -28,6 +29,10 @@ onMount(() => {
                 let routeToDraw = RG.offeredRoutes[$selectedRouteIndex]
                 MD.drawWholeRouteOnMap((routeToDraw))
             }
+            else if($loadingStatus[0]===true && $loadingStatus[1]===true){
+                MD.drawWholeRouteOnMap(RG.offeredRoutes[0])
+            }
+
     });
 
     globalMap.set(map)

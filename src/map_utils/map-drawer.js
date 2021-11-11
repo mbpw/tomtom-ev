@@ -165,7 +165,7 @@ export class MapDrawer{
 
     prettifyCodeName(string)
     {
-        return (string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()).replace('_',' ');
+        return (string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()).replaceAll('_',' ');
     }
 
     zoomToPointAnimate(timestamp,startTimestamp,duration, zoom,initZoom,location,initLocation, map){

@@ -5,6 +5,7 @@
     import DotsSeparator from "./DotsSeparator.svelte";
     import Button from "../../Components/Button.svelte";
     import {carProfileStore, endPointStore, startDateStore, startPointStore} from "../../stores/userInput";
+    import {loadingStatus} from "../../stores/appState";
 
     import {chargingStops} from "../../stores/routesInfo";
     import {openedScreen} from "../../stores/appState";
@@ -25,6 +26,13 @@
 
     async function computeChargingStopsNumber() {
         $chargingStops = await RG.computeOptimalRouteSize($startPointStore.latlng, $endPointStore.latlng)
+    }
+    async function computeStationsObject() {
+        await RG.generateStationsObject($startPointStore.latlng,$endPointStore.latlng)
+        loadingStatus.update(value=> {
+            value[0]=true
+            return value
+        })
     }
 
     let waiting = false;
@@ -75,6 +83,7 @@
         waiting = true;
         initCarParams();
         computeChargingStopsNumber();
+        computeStationsObject();
     }}>
         {#if waiting}
             Waiting...
