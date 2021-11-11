@@ -2,6 +2,7 @@
     import TimePickerModal from './TimePickerModal.svelte'
     import { fade } from 'svelte/transition'
     import {startDateStore} from "../../stores/userInput";
+    import  "../../styles.scss"
 
     export let showModal
 
@@ -29,11 +30,9 @@
     /* The TimePicker options */
     let options = {
         /* Global colors */
-        bgColor: '#2f855a',
+        bgColor: '#10C093',
         /* Components styles */
         buttonClassName: 'modal-button',
-        buttonBarClassName: 'modal-bar',
-        timeClassName: 'modal-time',
         /* Options */
         hasButtons: true,
         zIndex: 200,

@@ -1,3 +1,3 @@
 import { writable } from 'svelte/store';
 
-export const openedScreen = writable(1);
+export const openedScreen = writable(0);
