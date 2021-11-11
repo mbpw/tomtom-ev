@@ -2,7 +2,7 @@
     import Header from "../../Components/Header.svelte";
     import Button from "../../Components/Button.svelte";
     import GrayButton from "./GrayButton.svelte";
-    import {openedScreen} from "../../stores/appState";
+    import {loadingStatus, openedScreen} from "../../stores/appState";
     import {routesStore} from "../../stores/routesInfo";
     import {startPointStore} from "../../stores/userInput";
     import {endPointStore} from "../../stores/userInput";
@@ -19,7 +19,8 @@
     import {randomize_ids} from "./categories";
 
     const {open} = getContext('simple-modal');
-
+    let isRoutesClicked = false
+    let routesCanBeComputed = false
     $stopsPreferences = [];
     for (let i = 0; i < $chargingStops; i++) {
         $stopsPreferences.push({
@@ -33,17 +34,38 @@
     const showSurprise = (slot) => {
         open(CategorySelectorModal, {slot: slot});
     };
+    loadingStatus.subscribe(value => {
+        if(value[0]===true && isRoutesClicked && !routesCanBeComputed){
+            prepareRoutes()
+        }
+        else if(value[0]===true &&!isRoutesClicked){
+            routesCanBeComputed=true
+        }
+    })
+
+    function prepareRoutesClicked(){
+        if (routesCanBeComputed)
+            prepareRoutes()
+        else
+            isRoutesClicked = true
+    }
 
     async function prepareRoutes(){
         console.log($stopsPreferences)
         console.log($startPointStore)
         console.log($endPointStore)
-        await RG.generateStationsObject($startPointStore.latlng,$endPointStore.latlng)
+
+        // await RG.generateStationsObject($startPointStore.latlng,$endPointStore.latlng)
         let routes = await RG.computeAllRouteOffers(3,$stopsPreferences)
         console.log(routes)
         routesStore.set(routes)
         console.log(RG.offeredRoutes)
-        MD.drawWholeRouteOnMap(RG.offeredRoutes[0])
+        loadingStatus.update(value=> {
+            value[1]=true
+            return value
+        })
+
+        // MD.drawWholeRouteOnMap(RG.offeredRoutes[0])
     }
 </script>
 
@@ -83,7 +105,8 @@
     <div class="buttons">
         <Button on:click={() => {
             $openedScreen += 1;
-            prepareRoutes()
+            prepareRoutesClicked()
+
         }}>
             Next
         </Button>

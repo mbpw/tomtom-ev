@@ -3,6 +3,19 @@
     import Header from "../../Components/Header.svelte";
     import Button from "../../Components/Button.svelte";
     import {openedScreen} from "../../stores/appState";
+    import {loadingStatus} from "../../stores/appState";
+    import {MD} from "../../map_utils/map-drawer";
+    import {RG} from "../../computing_engine/route-generator";
+
+    loadingStatus.subscribe(value =>{
+        console.log('TESTTESTTEST')
+        console.log(value)
+        if (value[0] === true && value[1]===true){
+            console.log('LOADING FINISHED!!!')
+            $openedScreen += 1
+        }
+        }
+    )
 </script>
 
 <div class="_flex">
