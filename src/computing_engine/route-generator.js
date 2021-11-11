@@ -47,9 +47,16 @@ export class RouteGenerator {
         let body = {json: car_params}
         let optimalRoute = await this.makeOptimalRouteApiCall(endpointURL, body)
         return this.optimalRoute = optimalRoute
-
     }
 
+    async computeOptimalRouteSize(start_point, end_point) {
+        let startPoint = [start_point.lat,start_point.lng]
+        let endPoint = [end_point.lat,end_point.lng]
+        let endpointURL = this.getEndpointURL(startPoint[0], startPoint[1], endPoint[0], endPoint[1], this.currentChargeInkWh)
+        let body = {json: car_params}
+        let optimalRoute = await this.makeOptimalRouteApiCall(endpointURL, body)
+        return optimalRoute.routes[0].legs.length-1
+    }
 
     async getPointsOfOptimalRoute() {
         if (this.optimalRoute == null) {
@@ -97,7 +104,6 @@ export class RouteGenerator {
             return this.optimalRoute
         }
     }
-
 
     async generateStationsObject(start_point, end_point, categories){
         this.startPoint = [start_point.lat,start_point.lng]

@@ -7,6 +7,7 @@
     import {carProfileStore, endPointStore, startPointStore} from "../../stores/userInput";
     import {chargingStops} from "../../stores/routesInfo";
     import {openedScreen} from "../../stores/appState";
+    import {RG} from "../../computing_engine/route-generator";
 
     import ChargingStopsButton from "./ChargingStopsButton.svelte";
     import {getContext} from "svelte";
@@ -14,6 +15,10 @@
     import CarSelectModal from "./CarSelectModal.svelte";
 
     const {open} = getContext('simple-modal');
+
+    async function computeChargingStopsNumber(){
+        $chargingStops = await RG.computeOptimalRouteSize($startPointStore.latlng,$endPointStore.latlng)
+    }
 
 </script>
 
@@ -64,6 +69,8 @@
         $chargingStops = 0;
     else
         $chargingStops = 4;
+    computeChargingStopsNumber()
+
 }}>
         Go!
     </Button>
