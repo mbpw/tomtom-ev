@@ -1,6 +1,6 @@
 export const carProfiles = [
     {
-        name: 'Super Tesla',
+        name: 'Tesla ~100kWh',
         params: {
             constantSpeedConsumptionInkWhPerHundredkm: "32,10.87:77,18.01",
             currentChargeInkWh: 20,
@@ -72,7 +72,7 @@ export const carProfiles = [
     },
 
     {
-        name: 'Słabe BMW',
+        name: 'BMW ~40kWh',
         params: {
             constantSpeedConsumptionInkWhPerHundredkm: "32,10.87:77,18.01",
             currentChargeInkWh: 20,

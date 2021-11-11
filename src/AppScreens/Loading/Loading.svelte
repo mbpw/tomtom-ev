@@ -4,8 +4,6 @@
     import Button from "../../Components/Button.svelte";
     import {openedScreen} from "../../stores/appState";
     import {loadingStatus} from "../../stores/appState";
-    import {MD} from "../../map_utils/map-drawer";
-    import {RG} from "../../computing_engine/route-generator";
 
     loadingStatus.subscribe(value =>{
         console.log('TESTTESTTEST')
@@ -16,6 +14,23 @@
         }
         }
     )
+
+    let text = "Connecting";
+    setTimeout(() => {
+        text = 'Downloading'
+    }, 800)
+    setTimeout(() => {
+        text = 'Calculating best routes'
+    }, 1400)
+    setTimeout(() => {
+        text = 'Please wait...'
+    }, 5000)
+    setTimeout(() => {
+        text = 'Something went wrong :( \nRefresh and try again.'
+    }, 15000)
+    // setTimeout(() => {
+    //     text = 'Downloading'
+    // }, 1500)
 </script>
 
 <div class="_flex">
@@ -26,19 +41,19 @@
     </div>
 
     <Header backButton={false}>
-        Please wait
+        {text}
     </Header>
 
-    <Button on:click={() => {
-        $openedScreen += 1;
-    }}>
-        Debug
-    </Button>
-    <Button on:click={() => {
-        $openedScreen -= 1;
-    }}>
-        Debug Back
-    </Button>
+<!--    <Button on:click={() => {-->
+<!--        $openedScreen += 1;-->
+<!--    }}>-->
+<!--        Debug-->
+<!--    </Button>-->
+<!--    <Button on:click={() => {-->
+<!--        $openedScreen -= 1;-->
+<!--    }}>-->
+<!--        Debug Back-->
+<!--    </Button>-->
 </div>
 
 <style>

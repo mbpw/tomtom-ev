@@ -20,7 +20,7 @@
     let es = new EVSearcher(startPoint, endPoint);
     let ps = new POISearcher('pedestrian', 1800);
 
-    let kamil = true;
+    let kamil = false;
 
     let ev_stations = {"results": []};
     let ev_coords = [];
