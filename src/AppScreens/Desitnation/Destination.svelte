@@ -9,7 +9,6 @@
     import {openedScreen} from "../../stores/appState";
 
     import ChargingStopsButton from "./ChargingStopsButton.svelte";
-    import CategorySelectorModal from "../Stops/CategorySelectorModal.svelte";
     import {getContext} from "svelte";
     import MapPickerModal from "./MapPickerModal.svelte";
 
@@ -55,12 +54,14 @@
     Select car profile
 </MapPointSelectButton>
 
-<Button on:click={() => {
+{#if !$chargingStops}
+    <Button on:click={() => {
     console.log('Pocisk')
     if($chargingStops)
         $chargingStops = 0;
     else
         $chargingStops = 4;
 }}>
-    Go!
-</Button>
+        Go!
+    </Button>
+{/if}
