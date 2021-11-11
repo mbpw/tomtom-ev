@@ -4,7 +4,8 @@
     import TimePickerButton from "./TimePickerButton.svelte";
     import DotsSeparator from "./DotsSeparator.svelte";
     import Button from "../../Components/Button.svelte";
-    import {carProfileStore, endPointStore, startPointStore} from "../../stores/userInput";
+    import {carProfileStore, endPointStore, startDateStore, startPointStore} from "../../stores/userInput";
+
     import {chargingStops} from "../../stores/routesInfo";
     import {openedScreen} from "../../stores/appState";
     import {RG} from "../../computing_engine/route-generator";
@@ -13,18 +14,20 @@
     import {getContext} from "svelte";
     import MapPickerModal from "./MapPickerModal.svelte";
     import CarSelectModal from "./CarSelectModal.svelte";
+    import {carProfiles} from "./carProfiles";
 
     const {open} = getContext('simple-modal');
 
-    function initCarParams(){
+    function initCarParams() {
         console.log($carProfileStore)
-        RG.initCarParams($carProfileStore.params,$carProfileStore.body)
+        RG.initCarParams($carProfileStore.params, $carProfileStore.body)
     }
 
-    async function computeChargingStopsNumber(){
-        $chargingStops = await RG.computeOptimalRouteSize($startPointStore.latlng,$endPointStore.latlng)
+    async function computeChargingStopsNumber() {
+        $chargingStops = await RG.computeOptimalRouteSize($startPointStore.latlng, $endPointStore.latlng)
     }
 
+    let waiting = false;
 </script>
 
 <Header>
@@ -69,15 +72,44 @@
 
 {#if !$chargingStops}
     <Button on:click={() => {
-    console.log('Pocisk')
-    if($chargingStops)
+        waiting = true;
+        initCarParams();
+        computeChargingStopsNumber();
+    }}>
+        {#if waiting}
+            Waiting...
+        {:else}
+            Go!
+        {/if}
+    </Button>
+{:else}
+    <Button on:click={() => {
         $chargingStops = 0;
-    else
-        $chargingStops = 4;
-    initCarParams()
-    computeChargingStopsNumber()
+        waiting = false;
 
+        $startDateStore = new Date();
+        $startPointStore = {
+            address: 'Choose a start point',
+            latlng: {
+                lat: 52.32563573919947,
+                lng: 10.523825676170611
+            }
+        };
+        $endPointStore = {
+            address: 'Choose an end point',
+            latlng: {
+                lat: 52.509548827862005,
+                lng: 13.62762775333342
+            }
+        };
+        $carProfileStore = ({
+            name: 'Select car profile',
+            // body: undefined,
+            // params: undefined
+            body: carProfiles[1].body,
+            params: carProfiles[1].params
+        });
 }}>
-        Go!
+        Reset
     </Button>
 {/if}
