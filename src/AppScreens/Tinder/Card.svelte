@@ -1,9 +1,10 @@
 <script>
     import Button from "../../Components/Button.svelte";
     import {startDateStore} from "../../stores/userInput";
-    import {routesStore} from "../../stores/routesInfo";
+    import {routesStore, selectedRouteIndex} from "../../stores/routesInfo";
     import {RG} from "../../computing_engine/route-generator";
     import {MD} from "../../map_utils/map-drawer";
+    import {openedScreen} from "../../stores/appState";
 
     export let route;
     export let routeIndex;
@@ -22,7 +23,10 @@
             </div>
         </div>
         <div>
-            <Button>
+            <Button on:click={() => {
+                $openedScreen += 1;
+                $selectedRouteIndex = routeIndex;
+            }}>
                 Select
             </Button>
         </div>

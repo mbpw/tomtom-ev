@@ -1,8 +1,8 @@
 <script>
-
+    export let blue = false;
 </script>
 
-<div class="_button" on:click>
+<div class="_button" class:blue on:click>
     <div class="_text">
         <slot>
             Button
@@ -27,6 +27,10 @@
     }
 
     ._button:active {
+        background-color: $secondary;
+    }
+
+    .blue {
         background-color: $secondary;
     }
 

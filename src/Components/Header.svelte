@@ -2,19 +2,20 @@
     import {openedScreen} from "../stores/appState";
 
     export let backButton = true;
+    export let blue = false;
 </script>
 
 
 <div class="_header">
     {#if backButton}
-        <div class="_back" on:click={() => {
+        <div class="_back" class:blue-icon={blue} on:click={() => {
             $openedScreen -= 1;
         }}>
             <img src="./icons/arrow_right.svg" alt="Choose charging stops"/>
         </div>
     {/if}
     <div class="grow">
-        <h1 class:centering-margin={backButton}>
+        <h1 class:centering-margin={backButton} class:blue>
             <slot>
                 Let's go!
             </slot>
@@ -70,6 +71,13 @@
     }
 
     ._back:active {
+        background-color: $secondary;
+    }
+
+    .blue {
+        color: $secondary;
+    }
+    .blue-icon {
         background-color: $secondary;
     }
 </style>
