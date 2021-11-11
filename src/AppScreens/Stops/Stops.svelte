@@ -4,6 +4,9 @@
     import GrayButton from "./GrayButton.svelte";
     import {openedScreen} from "../../stores/appState";
     import {routesStore} from "../../stores/routesInfo";
+    import {startPointStore} from "../../stores/userInput";
+    import {endPointStore} from "../../stores/userInput";
+
 
     import {getContext} from 'svelte';
     import CategorySelectorModal from "./CategorySelectorModal.svelte";
@@ -30,7 +33,10 @@
     };
 
     async function prepareRoutes(){
-        await RG.generateStationsObject()
+        console.log($stopsPreferences)
+        console.log($startPointStore)
+        console.log($endPointStore)
+        await RG.generateStationsObject($startPointStore.latlng,$endPointStore.latlng,$stopsPreferences)
         let routes = await RG.computeAllRouteOffers(3)
         console.log(routes)
         routesStore.set(routes)

@@ -123,7 +123,7 @@ export class MapDrawer{
         markerElement.appendChild(markerContentElement);
         let iconElement = document.createElement('div');
         iconElement.className = 'marker-icon';
-        iconElement.innerHTML = "<img src='/public/icons/gps.svg'>"
+        iconElement.innerHTML = "<img src=icon>"
         markerContentElement.appendChild(iconElement);
         // add marker to map
         return new tt.Marker({element: markerElement, anchor: 'bottom'})
@@ -141,7 +141,7 @@ export class MapDrawer{
             let i = 0
             for (const coordinate of coordinates) {
                 console.log(coordinate)
-                let marker = this.createMarker('accident.colors-white.svg',"#d20c0c").setDraggable(false).setLngLat(coordinate)
+                let marker = this.createMarker('/public/icons/gps.svg',"#d20c0c").setDraggable(false).setLngLat(coordinate)
                 // let markerElement = document.createElement('div');
                 // markerElement.innerHTML = "<img src='/public/icons/gps.svg' style='offset: 100px'>";
                 // let marker = new tt.Marker({element: markerElement,

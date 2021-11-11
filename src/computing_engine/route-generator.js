@@ -98,32 +98,42 @@ export class RouteGenerator {
         }
     }
 
-    async generateStationsObject(){
+
+    async generateStationsObject(start_point, end_point, categories){
+        this.startPoint = [start_point.lat,start_point.lng]
+        this.endPoint = [end_point.lat,end_point.lng]
         let es = new EVSearcher(this.startPoint, this.endPoint);
         let ps = new POISearcher('pedestrian', 1800);
         console.log("Prepare variables...")
+        let ev_stations = {results: []}
+        let routeCoordsList = []
+        let stationsCoordsList = []
 
-        let pointsList = []
-        let stationsList = []
-        let ev_stations = {"results": []};
 
         console.log("Get first (optimal) route...")
         let optimal_route = await this.computeOptimalRoute()
         let pts = await this.getPointsOfOptimalRoute()
 
 
-        console.log("Get route's EV stations...")
+        console.log("Get route's EV stations and add to list...")
         for (const leg of optimal_route.routes[0].legs) {
             for (const point of leg.points) {
-                pointsList.push([point.longitude, point.latitude])
+                routeCoordsList.push([point.longitude, point.latitude])
             }
-            stationsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
+            stationsCoordsList.push([leg.points.at(-1).longitude, leg.points.at(-1).latitude])
         }
-
-        console.log("Searching for EV")
-        let optimal_pois = await es.batchLatLonSearch(stationsList)
+        let optimal_pois = await es.batchLatLonSearch(stationsCoordsList)
         for (const poi of optimal_pois.batchItems) {
             ev_stations.results.push(poi.response.results[0])
+        }
+
+        console.log("Replacing legs and searching for EV stations again...")
+        es.replaceRouteLegs(pts)
+
+        let stations2 = await es.computeEVs()
+        // console.log(stations2.results)
+        for (const station of stations2.results) {
+            ev_stations.results.push(station)
         }
 
         console.log("Calculating reachable range...")
@@ -131,15 +141,30 @@ export class RouteGenerator {
         let i1 = 0
         for (let element of poly1.batchItems) {
             ev_stations.results[i1].reachableRange = element.response.reachableRange.boundary
-            console.log(element.response.reachableRange.boundary)
+            // console.log(element.response.reachableRange.boundary)
             i1++
         }
         console.log("Batch search POIs...")
         let pois1 = await ps.searchBatchPois(ev_stations.results)
         let k1 = 0
-        for (let poi of pois1.batchItems) {
-            ev_stations.results[k1].pois = poi.response.results
-            // ev_stations.results[k1].visited = false
+
+        for (let poi_list of pois1.batchItems) {
+            let p = poi_list.response.results
+            ev_stations.results[k1].pois = p
+
+            // Summary for pois
+            let categories_count = {}
+            for (let poi of p) {
+                let category_id = poi.poi.categorySet[0].id.toString()
+                console.log(category_id)
+                if (category_id in categories_count) {
+                    categories_count[category_id]++
+                } else {
+                    categories_count[category_id] = 1
+                }
+            }
+            ev_stations.results[k1].pois_summary = categories_count
+            console.log(categories_count)
             k1++
         }
 
@@ -156,39 +181,10 @@ export class RouteGenerator {
         await this.markStationsAsVisited(ev_stations.results)
         console.log("markPoisAsNotVisited...")
         await this.markPoisAsNotVisited()
-        console.log(ev_stations)
-
-        console.log("Replacing legs and searching for EV stations again...")
-        es.replaceRouteLegs(pts)
-
-        let stations2 = await es.computeEVs()
-        // console.log(stations2.results)
-        for (const station of stations2.results) {
-            ev_stations.results.push(station)
-        }
-
-
-        console.log("Calculating reachable range...")
-        let poly = await ps.calculateBatchPolygons(ev_stations)
-        let i = 0
-        for (let element of poly.batchItems) {
-            ev_stations.results[i].reachableRange = element.response.reachableRange.boundary
-            console.log(element.response.reachableRange.boundary)
-            i++
-        }
-        console.log("Batch search POIs...")
-        let pois = await ps.searchBatchPois(ev_stations.results)
-        let k = 0
-        for (let poi of pois.batchItems) {
-            ev_stations.results[k].pois = poi.response.results
-            ev_stations.results[k].visited = false
-            k++
-        }
         this.evStations = ev_stations.results
     }
 
     async prepareRouteOffer(ev_stations) {
-        this.evStations = ev_stations.results
         await this.getNextRoute()
         const POIsOnRoute = []
         for (const leg of this.optimalRoute.routes[0].legs) {
@@ -209,8 +205,10 @@ export class RouteGenerator {
 
     async selectPOINearStation(station) { //POI selection from given station later
         const POI = station.pois.find(element => element.visited === false);
+        console.log(this.evStations)
         console.log(station)
         console.log(POI)
+        console.log("TUUUTEJ!!!!!!")
         const index = station.pois.indexOf(POI)
         console.log(index)
         if (index !== -1) {
@@ -285,6 +283,7 @@ export class RouteGenerator {
 
     async computeAllRouteOffers(numOffers = 3){
         let routes = []
+
         await this.markPoisAsNotVisited()
         for(let i = 0; i < numOffers; i++){
             routes.push(await this.prepareRouteOffer())
