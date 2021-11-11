@@ -25,7 +25,7 @@
 <style lang="scss">
     ._background {
         background-color: $darkGray;
-        margin: 50px 30px;
+        margin: 50px 90px;
         border-radius: 100px;
         display: flex;
         justify-content: space-between;

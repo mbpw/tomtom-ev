@@ -9,6 +9,12 @@
     import {openedScreen} from "../../stores/appState";
 
     import ChargingStopsButton from "./ChargingStopsButton.svelte";
+    import CategorySelectorModal from "../Stops/CategorySelectorModal.svelte";
+    import {getContext} from "svelte";
+    import MapPickerModal from "./MapPickerModal.svelte";
+
+    const {open} = getContext('simple-modal');
+
 </script>
 
 <Header>
@@ -18,8 +24,10 @@
 
 <TimePickerButton/>
 
-<MapPointSelectButton gps="true">
-    {$startPointStore}
+<MapPointSelectButton gps="true" on:click={() => {
+   open(MapPickerModal, {store: startPointStore}, {closeButton: false, styleContent: {padding: 0, borderRadius: '10px'}});
+}}>
+    {$startPointStore.address}
 </MapPointSelectButton>
 
 <DotsSeparator/>
@@ -37,8 +45,10 @@
     <DotsSeparator/>
 {/if}
 
-<MapPointSelectButton>
-    {$endPointStore}
+<MapPointSelectButton on:click={() => {
+       open(MapPickerModal, {store: endPointStore}, {closeButton: false, styleContent: {padding: 0, borderRadius: '10px'}});
+}}>
+    {$endPointStore.address}
 </MapPointSelectButton>
 
 <MapPointSelectButton>
