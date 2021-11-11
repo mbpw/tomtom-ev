@@ -16,15 +16,17 @@
 
     import {RG} from "../../computing_engine/route-generator";
     import {MD} from "../../map_utils/map-drawer";
+    import {all_categories_ids} from "./categories";
 
     const {open} = getContext('simple-modal');
 
     $stopsPreferences = [];
     for (let i = 0; i < $chargingStops; i++) {
         $stopsPreferences.push({
-            name: '',
-            option: '',
-            icon: ''
+            name: 'Randomize',
+            option: 'Randomize',
+            icon: '',
+            category_id: all_categories_ids
         })
     }
 
