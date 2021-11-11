@@ -138,7 +138,6 @@
             ev_stations.results[k].visited = false
             k++
         }
-
         // console.log(ev_stations)
 
     }
@@ -170,7 +169,7 @@
 
     async function displayRoute() {
         console.log("Prepare route offer...")
-        routeOffer = await rg.prepareRouteOffer(ev_stations)
+        routeOffer = await rg.prepareRouteOffer()
         console.log(routeOffer)
 
 

@@ -1,6 +1,7 @@
 <script>
     import Button from "../../Components/Button.svelte";
     import {startDateStore} from "../../stores/userInput";
+    import {routesStore} from "../../stores/routesInfo";
     import {RG} from "../../computing_engine/route-generator";
     import {MD} from "../../map_utils/map-drawer";
 
@@ -49,7 +50,9 @@
         {#each route.stops as stop, i}
             <div class="stop"
                 on:click={() => {
-                    let poi = RG.offeredRoutes[routeIndex].routes[0].legs[i].proposedPoi
+                    console.log(RG.offeredRoutes)
+                    console.log($routesStore)
+                    let poi = RG.offeredRoutes[routeIndex].routes[0].legs[$routesStore[routeIndex].stops[i].legNum].proposedPoi
                     if (poi !== undefined){
                         MD.zoomAndTogglePoi(poi)
                     }
