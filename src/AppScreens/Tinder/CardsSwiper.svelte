@@ -5,11 +5,15 @@
     import {RG} from "../../computing_engine/route-generator";
 
     import 'swiper/css';
+    import 'swiper/css/pagination';
     import {routesStore} from "../../stores/routesInfo";
+    import {Pagination} from "swiper";
 </script>
 
 <Swiper class="mySwiper"
-    on:activeIndexChange={(e) => {
+        modules={[Pagination]}
+        pagination={{ clickable: true, el: '.swiper-pagination', }}
+        on:activeIndexChange={(e) => {
         const activeRouteIndex = e.detail[0][0].activeIndex;
         console.log(activeRouteIndex);
         let routeToDraw = RG.offeredRoutes[activeRouteIndex]
@@ -23,10 +27,11 @@
         </SwiperSlide>
     {/each}
 </Swiper>
+<div class="swiper-pagination"></div>
 
 <style>
     :global(.swiper) {
-        /*transform: translateY(-15px);*/
+        transform: translateY(-40px);
     }
 
     :global(.swiper-slide) {

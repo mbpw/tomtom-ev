@@ -1,25 +1,14 @@
 <script>
     import Header from "../../Components/Header.svelte";
     import Map from "../../Components/Map.svelte";
-
-    import {openedScreen} from "../../stores/appState";
     import CardsSwiper from "./CardsSwiper.svelte";
 </script>
 
 
 <div class="_parent">
-    <div class="_header">
-        <div class="_back" on:click={() => {
-            $openedScreen = 2
-        }}>
-            <img src="./icons/arrow_right.svg" alt="Choose charging stops"/>
-        </div>
-        <div class="grow">
-            <Header>
-                Choose your route
-            </Header>
-        </div>
-    </div>
+    <Header>
+        Choose your route
+    </Header>
 
     <Map/>
 

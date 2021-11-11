@@ -89,7 +89,7 @@
 <style lang="scss">
     .card {
         width: 90vw;
-        height: 300px;
+        height: 400px;
         padding: 10px;
         margin: 10px 10px;
         z-index: 1000000000;
