@@ -129,7 +129,7 @@ export class RouteGenerator {
             const endpointURLFirst = this.getEndpointURL(this.startPoint[0], this.startPoint[1], newStationLocation[0], newStationLocation[1], this.currentChargeInkWh)
             let body = {json: this.carParams}
             let optimalRouteFirst = await this.makeOptimalRouteApiCall(endpointURLFirst, body)
-            const endpointURLSecond = this.getEndpointURL(newStationLocation[0], newStationLocation[1], this.endPoint[0], this.endPoint[1], this.maxChargeInkWh)
+            const endpointURLSecond = this.getEndpointURL(newStationLocation[0], newStationLocation[1], this.endPoint[0], this.endPoint[1], this.minChargeAtChargingStopsInkWh)
             let optimalRouteSecond = await this.makeOptimalRouteApiCall(endpointURLSecond, body)
             this.optimalRoute = optimalRouteFirst
             this.optimalRoute.routes[0].summary.lengthInMeters += optimalRouteSecond.routes[0].summary.lengthInMeters
@@ -175,7 +175,7 @@ export class RouteGenerator {
 
         console.log("Replacing legs and searching for EV stations again...")
         es.replaceRouteLegs(pts)
-        this.pause(100)
+        // this.pause(50)
         let stations2 = await es.computeEVs()
         // console.log(stations2.results)
         for (const station of stations2.results) {
@@ -265,6 +265,14 @@ export class RouteGenerator {
         let POI = station.pois.find(element => element.visited === false && this.preferences.priority_preferences.includes(element.poi.categorySet[0].id));
         let index = station.pois.indexOf(POI)
         if (index === -1){
+            POI = station.pois.find(element => this.preferences.priority_preferences.includes(element.poi.categorySet[0].id));
+            index = station.pois.indexOf(POI)
+        }
+        if (index === -1){
+            POI = station.pois.find(element => element.visited === false && this.preferences.full_preferences.includes(element.poi.categorySet[0].id));
+            index = station.pois.indexOf(POI)
+        }
+        if (index === -1){
             POI = station.pois.find(element => this.preferences.full_preferences.includes(element.poi.categorySet[0].id));
             index = station.pois.indexOf(POI)
         }
@@ -279,7 +287,7 @@ export class RouteGenerator {
 
             station.pois[index].visited = true
             let prefInd = this.preferences.full_preferences.indexOf(station.pois[index].poi.categorySet[0].id)
-            this.preferences.full_preferences.splice(prefInd,1)
+            // this.preferences.full_preferences.splice(prefInd,1)
             const POILocation = [POI.position.lat, POI.position.lon]
             const stationLocation = [station.position.lat, station.position.lon]
             const ws = new WalkSimulator(stationLocation, POILocation)
@@ -291,7 +299,7 @@ export class RouteGenerator {
     }
     prettifyCodeName(string)
     {
-        return (string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()).replace('_',' ');
+        return (string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()).replaceAll('_',' ');
     }
 
     async markStationsAsVisited(stations) {
