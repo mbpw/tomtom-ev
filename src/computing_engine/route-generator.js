@@ -1,5 +1,5 @@
 import ky from 'ky';
-import {car_params, ev_stations} from './temp_data';
+import {ev_stations} from './temp_data';
 import {WalkSimulator} from "./walk-simulator";
 import {EVSearcher} from "./ev-searcher";
 import {POISearcher} from "./poi-searcher";
@@ -31,6 +31,16 @@ export class RouteGenerator {
         this.optimalRouteTravelTime = 0
         this.actualRouteTravelTime = 0
         this.offeredRoutes = []
+        this.carParams = {}
+    }
+
+    initCarParams(params,body){
+        this.carParams = body
+        this.constantSpeedConsumptionInkWhPerHundredkm = params.constantSpeedConsumptionInkWhPerHundredkm
+        this.currentChargeInkWh = params.currentChargeInkWh
+        this.maxChargeInkWh = params.maxChargeInkWh
+        this.minChargeAtDestinationInkWh = params.minChargeAtDestinationInkWh
+        this.minChargeAtChargingStopsInkWh = params.minChargeAtChargingStopsInkWh
     }
 
     getEndpointURL(start_x, start_y, stop_x, stop_y, currentCharge) {
@@ -44,7 +54,7 @@ export class RouteGenerator {
 
     async computeOptimalRoute() {
         let endpointURL = this.getEndpointURL(this.startPoint[0], this.startPoint[1], this.endPoint[0], this.endPoint[1], this.currentChargeInkWh)
-        let body = {json: car_params}
+        let body = {json: this.carParams}
         let optimalRoute = await this.makeOptimalRouteApiCall(endpointURL, body)
         return this.optimalRoute = optimalRoute
     }
@@ -53,7 +63,7 @@ export class RouteGenerator {
         let startPoint = [start_point.lat,start_point.lng]
         let endPoint = [end_point.lat,end_point.lng]
         let endpointURL = this.getEndpointURL(startPoint[0], startPoint[1], endPoint[0], endPoint[1], this.currentChargeInkWh)
-        let body = {json: car_params}
+        let body = {json: this.carParams}
         let optimalRoute = await this.makeOptimalRouteApiCall(endpointURL, body)
         return optimalRoute.routes[0].legs.length-1
     }
@@ -92,7 +102,7 @@ export class RouteGenerator {
             this.evStations[index].visited = true
             const newStationLocation = [station.position.lat, station.position.lon]
             const endpointURLFirst = this.getEndpointURL(this.startPoint[0], this.startPoint[1], newStationLocation[0], newStationLocation[1], this.currentChargeInkWh)
-            let body = {json: car_params}
+            let body = {json: this.carParams}
             let optimalRouteFirst = await this.makeOptimalRouteApiCall(endpointURLFirst, body)
             const endpointURLSecond = this.getEndpointURL(newStationLocation[0], newStationLocation[1], this.endPoint[0], this.endPoint[1], this.maxChargeInkWh)
             let optimalRouteSecond = await this.makeOptimalRouteApiCall(endpointURLSecond, body)
