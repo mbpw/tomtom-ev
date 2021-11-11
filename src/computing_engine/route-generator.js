@@ -69,7 +69,18 @@ export class RouteGenerator {
         return optimalRoute.routes[0].legs.length-1
     }
 
-    async getPointsOfOptimalRoute() {
+    getRandomSubarray(arr, size) {
+        var shuffled = arr.slice(0), i = arr.length, temp, index;
+        while (i--) {
+            index = Math.floor((i + 1) * Math.random());
+            temp = shuffled[index];
+            shuffled[index] = shuffled[i];
+            shuffled[i] = temp;
+        }
+        return shuffled.slice(0, size);
+    }
+
+    getPointsOfOptimalRoute() {
         if (this.optimalRoute == null) {
             this.computeOptimalRoute()
         }
@@ -77,7 +88,18 @@ export class RouteGenerator {
         for (const leg of this.optimalRoute.routes[0].legs) {
             points.push(...leg.points)
         }
-        return points
+        let sample = this.getRandomSubarray(points,100)
+        return sample
+    }
+
+    findBestNewStation(stations){
+        let bestStation = stations[0]
+        for (let station of stations){
+            if(station.visited===false && station.pois.length > bestStation.pois.length){
+                bestStation = station
+            }
+        }
+        return bestStation
     }
 
     async getNextRoute() {
@@ -92,13 +114,15 @@ export class RouteGenerator {
             this.optimalRouteGoodEnough = false
             return await this.computeOptimalRoute()
         } else {
-            let station = this.evStations.find(element => element.visited === false);
-            if (station === undefined) {
-                for (const station of this.evStations) {
-                    station.visited = false
-                }
-                station = this.evStations.find(element => element.visited === false);
-            }
+            // let station = this.evStations.find(element => element.visited === false);
+            let station = this.findBestNewStation(this.evStations)
+            // if (station === undefined) {
+            //     for (const station of this.evStations) {
+            //         station.visited = false
+            //     }
+            //     // station = this.evStations.find(element => element.visited === false);
+            //     station = this.findBestNewStation(this.evStations)
+            // }
             const index = this.evStations.indexOf(station)
             this.evStations[index].visited = true
             const newStationLocation = [station.position.lat, station.position.lon]
@@ -113,6 +137,11 @@ export class RouteGenerator {
             this.optimalRoute.routes[0].legs.push(...optimalRouteSecond.routes[0].legs)
             this.actualRouteTravelTime = this.optimalRoute.routes[0].summary.travelTimeInSeconds
             return this.optimalRoute
+        }
+    }
+    pause(milliseconds) {
+        var dt = new Date();
+        while ((new Date()) - dt <= milliseconds) { /* Do nothing */
         }
     }
 
@@ -146,7 +175,7 @@ export class RouteGenerator {
 
         console.log("Replacing legs and searching for EV stations again...")
         es.replaceRouteLegs(pts)
-
+        this.pause(100)
         let stations2 = await es.computeEVs()
         // console.log(stations2.results)
         for (const station of stations2.results) {
@@ -204,33 +233,53 @@ export class RouteGenerator {
     async prepareRouteOffer(ev_stations) {
         await this.getNextRoute()
         const POIsOnRoute = []
-        let iter = 0
         for (const leg of this.optimalRoute.routes[0].legs) {
             if (leg.summary.chargingInformationAtEndOfLeg !== undefined) {
                 const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
                 const station = this.evStations.find(element => element.address.postalCode === postalCode);
                 if (station !== undefined) {
+                    station.visited=true
                     if (station.pois.length > 0) {
-                        const proposedPOI = await this.selectPOINearStation(station,iter)
+                        const proposedPOI = await this.selectPOINearStation(station)
                         leg.proposedPoi = proposedPOI
-                        iter++
+                    }
+                    else{
+                        console.log('NO POIS IN STATION!')
+                        console.log(station)
                     }
                 }
+                else{
+                    console.log('Station UNDEFINED')
+                    console.log(leg.summary.chargingInformationAtEndOfLeg)
+                }
+            }
+            else{
+                console.log('NO LEG CHARGNING INFO')
+                console.log(this.optimalRoute.routes[0])
             }
         }
         return this.optimalRoute
     }
 
-    async selectPOINearStation(station,num_station) { //POI selection from given station later
-        const POI = station.pois.find(element => element.visited === false && this.preferences[num_station].category_id.includes(element.poi.categorySet[0].id));
+    async selectPOINearStation(station) { //POI selection from given station later
+        let POI = station.pois.find(element => element.visited === false && this.preferences.priority_preferences.includes(element.poi.categorySet[0].id));
+        let index = station.pois.indexOf(POI)
+        if (index === -1){
+            POI = station.pois.find(element => this.preferences.full_preferences.includes(element.poi.categorySet[0].id));
+            index = station.pois.indexOf(POI)
+        }
+
         console.log(this.evStations)
         console.log(station)
         console.log(POI)
         console.log("TUUUTEJ!!!!!!")
-        const index = station.pois.indexOf(POI)
+
         console.log(index)
         if (index !== -1) {
+
             station.pois[index].visited = true
+            let prefInd = this.preferences.full_preferences.indexOf(station.pois[index].poi.categorySet[0].id)
+            this.preferences.full_preferences.splice(prefInd,1)
             const POILocation = [POI.position.lat, POI.position.lon]
             const stationLocation = [station.position.lat, station.position.lon]
             const ws = new WalkSimulator(stationLocation, POILocation)
@@ -300,12 +349,21 @@ export class RouteGenerator {
     }
 
     parsePreferences(preferences){
+        let full_preferences = []
+        let priority_preferences = []
         for (let preference of preferences){
             preference.category_id = preference.category_id.split(',').map(Number)
+            full_preferences.push(...preference.category_id)
+            if(preference.name !== "Randomize")
+                priority_preferences.push(...preference.category_id)
             // if(preference.category_id.includes(',')){
             //     preference.category_id = preference.category_id
             // }
         }
+        full_preferences =[...new Set(full_preferences)]
+        priority_preferences =[...new Set(priority_preferences)]
+        preferences.full_preferences = full_preferences
+        preferences.priority_preferences = priority_preferences
         return preferences
     }
 
