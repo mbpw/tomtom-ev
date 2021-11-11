@@ -1,7 +1,7 @@
 <script>
     import Header from "../../Components/Header.svelte";
     import {routesStore, selectedRouteIndex} from "../../stores/routesInfo";
-    import {startDateStore} from "../../stores/userInput";
+    import {startDateStore, startPointStore, endPointStore} from "../../stores/userInput";
 
     $: route = $routesStore[$selectedRouteIndex];
 </script>
@@ -33,7 +33,7 @@
         <p class="stop-title">Start</p>
         <div class="navigate" on:click={() => {
                 console.log(route)
-                window.open('geo:50,10', '_blank').focus();
+                window.open(`geo:${$startPointStore.latlng.lat},${$startPointStore.latlng.lng}`, '_blank').focus();
             }}>
             <img src="./icons/navigate.svg" alt="gps"/>
         </div>
@@ -53,7 +53,7 @@
             <p class="stop-title">{stop.name}</p>
             <div class="navigate" on:click={() => {
                 console.log(route)
-                window.open('geo:50,10', '_blank').focus();
+                window.open(`geo:${stop.position.latitude},${stop.position.longitude}`, '_blank').focus();
             }}>
                 <img src="./icons/navigate.svg" alt="gps"/>
             </div>
@@ -71,7 +71,7 @@
         <p class="stop-title">End</p>
         <div class="navigate" on:click={() => {
                 console.log(route)
-                window.open('geo:50,10', '_blank').focus();
+                window.open(`geo:${$endPointStore.latlng.lat},${$endPointStore.latlng.lng}`, '_blank').focus();
             }}>
             <img src="./icons/navigate.svg" alt="gps"/>
         </div>
