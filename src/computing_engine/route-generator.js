@@ -13,7 +13,6 @@ const key = 'KSiA3cYn3i5bjlooe5NlxW5tR5uF0t7P';
 
 export class RouteGenerator {
     constructor(startPoint = [52.32563573919947, 10.523825676170611], endPoint = [52.509548827862005, 13.62762775333342], constantSpeedConsumptionInkWhPerHundredkm = "32,10.87:77,18.01", currentChargeInkWh = 20, maxChargeInkWh = 40, minChargeAtDestinationInkWh = 4, minChargeAtChargingStopsInkWh = 4, POIs = null, evStations = null) {
-        this.randomCounter = 0;
         this.startPoint = startPoint
         this.endPoint = endPoint
         this.constantSpeedConsumptionInkWhPerHundredkm = constantSpeedConsumptionInkWhPerHundredkm
@@ -50,28 +49,6 @@ export class RouteGenerator {
         return this.optimalRoute = optimalRoute
 
     }
-
-    // async computeOptimalRoute() {
-    //     let endpointURL = this.getEndpointURL(this.startPoint[0], this.startPoint[1], this.endPoint[0], this.endPoint[1], this.currentChargeInkWh)
-    //     let body = {json: car_params}
-    //     let optimalRoute = await this.makeOptimalRouteApiCall(endpointURL, body)
-    //     this.optimalRoute = optimalRoute
-    //     console.log(this.optimalRoute.routes[0].legs)
-    //     for (const leg of this.optimalRoute.routes[0].legs) {
-    //         if (leg.summary.chargingInformationAtEndOfLeg !== undefined) {
-    //             const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
-    //             const station = this.evStations.find(element => element.address.postalCode === postalCode);
-    //             if (station !== undefined) {
-    //                 const index = this.evStations.indexOf(station)
-    //                 console.log(postalCode)
-    //                 this.evStations[index].visited = true
-    //             }
-    //         }
-    //     }
-    //     this.optimalRouteTravelTime = optimalRoute.routes[0].summary.travelTimeInSeconds
-    //     this.actualRouteTravelTime = this.optimalRouteTravelTime
-    //     return this.optimalRoute
-    // }
 
 
     async getPointsOfOptimalRoute() {
@@ -210,8 +187,8 @@ export class RouteGenerator {
         this.evStations = ev_stations.results
     }
 
-    async prepareRouteOffer() {
-        // this.evStations = ev_stations.results
+    async prepareRouteOffer(ev_stations) {
+        this.evStations = ev_stations.results
         await this.getNextRoute()
         const POIsOnRoute = []
         for (const leg of this.optimalRoute.routes[0].legs) {
@@ -232,7 +209,6 @@ export class RouteGenerator {
 
     async selectPOINearStation(station) { //POI selection from given station later
         const POI = station.pois.find(element => element.visited === false);
-        // const POI = station.pois[this.randomCounter++]
         console.log(station)
         console.log(POI)
         const index = station.pois.indexOf(POI)
@@ -270,7 +246,7 @@ export class RouteGenerator {
 
 
     async markPoisAsNotVisited() {
-        console.log(this.evStations)
+        // console.log(this.evStations)
         for (let station of this.evStations) {
             station.visited = false
             for (let poi of station.pois) {

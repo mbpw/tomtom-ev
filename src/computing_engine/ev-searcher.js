@@ -68,8 +68,6 @@ export class EVSearcher {
         let body = {json:{
             "batchItems": queries
         }}
-        console.log("BODYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
-        console.log(body)
         return await this.makeSearchApiCall(url, body)
     }
 
