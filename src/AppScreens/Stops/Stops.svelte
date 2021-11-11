@@ -82,7 +82,7 @@
 
     <div class="buttons">
         <Button on:click={() => {
-            $openedScreen = 3;
+            $openedScreen += 1;
             prepareRoutes()
         }}>
             Next

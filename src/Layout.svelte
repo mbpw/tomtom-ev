@@ -9,6 +9,7 @@
     import Tinder from "./AppScreens/Tinder/Tinder.svelte";
     import Summary from "./AppScreens/Summary/Summary.svelte";
     import RouteDetails from "./AppScreens/Summary/RouteDetails.svelte";
+    import Loading from "./AppScreens/Loading/Loading.svelte";
 
     const flyInOptions = {x: 200, duration: 200};
     const flyOutOptions = {x: -200, duration: 200};
@@ -34,17 +35,23 @@
 
     {#if $openedScreen === 3}
         <div in:fly={flyInOptions} out:fly={flyOutOptions}>
-            <Tinder />
+            <Loading />
         </div>
     {/if}
 
     {#if $openedScreen === 4}
         <div in:fly={flyInOptions} out:fly={flyOutOptions}>
-            <Summary />
+            <Tinder />
         </div>
     {/if}
 
     {#if $openedScreen === 5}
+        <div in:fly={flyInOptions} out:fly={flyOutOptions}>
+            <Summary />
+        </div>
+    {/if}
+
+    {#if $openedScreen === 6}
         <div in:fly={flyInOptions} out:fly={flyOutOptions}>
             <RouteDetails />
         </div>

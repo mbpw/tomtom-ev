@@ -49,7 +49,7 @@
     <div>
         <ChargingStopsButton on:click={() => {
             console.log('Pocisk');
-            $openedScreen = 2;
+            $openedScreen += 1;
         }}>
             {$chargingStops} charging stops
         </ChargingStopsButton>

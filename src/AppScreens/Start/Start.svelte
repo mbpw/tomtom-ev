@@ -15,7 +15,7 @@
 
 
     <Button on:click={() => {
-        $openedScreen = 1;
+        $openedScreen += 1;
     }}>
         Let's start!
     </Button>
