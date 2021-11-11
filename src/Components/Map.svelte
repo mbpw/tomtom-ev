@@ -2,6 +2,9 @@
 import tt from "@tomtom-international/web-sdk-maps";
 import '@tomtom-international/web-sdk-maps/dist/maps.css'
 import {globalMap} from "../store";
+import {selectedRouteIndex} from "../stores/routesInfo";
+import {MD} from "../map_utils/map-drawer";
+import {RG} from "../computing_engine/route-generator";
 import { onMount } from "svelte";
 let map
 let mapElement
@@ -18,6 +21,13 @@ onMount(() => {
         center: [21, 52],
         zoom: 5,
         attributionControlPosition: 'top-right'
+    });
+
+    map.on('load',function() {
+            if($selectedRouteIndex!==null){
+                let routeToDraw = RG.offeredRoutes[$selectedRouteIndex]
+                MD.drawWholeRouteOnMap((routeToDraw))
+            }
     });
 
     globalMap.set(map)
