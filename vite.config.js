@@ -20,9 +20,9 @@ export default defineConfig({
           base: '/',
           includeAssets: ['favicon.svg'],
           manifest: {
-              name: 'PWA Basic',
-              short_name: 'PWA Basic',
-              theme_color: '#ffffff',
+              name: 'Charge & Go',
+              short_name: 'Charge & Go',
+              theme_color: '#2182B1',
               icons: [
                   {
                       src: 'pwa-192x192.png', // <== don't add slash, for testing
