@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import {carProfiles} from "../AppScreens/Desitnation/carProfiles";
 
 export const startDateStore = writable(new Date());
 export const startPointStore = writable({
@@ -18,7 +19,10 @@ export const endPointStore = writable({
 
 export const carProfileStore = writable({
     name: 'Select car profile',
-    chargingParameters: undefined
+    // body: undefined,
+    // params: undefined
+    body: carProfiles[1].body,
+    params: carProfiles[1].params
 });
 
 export const stopsPreferences = writable([]);

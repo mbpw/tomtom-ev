@@ -4,13 +4,14 @@
     import TimePickerButton from "./TimePickerButton.svelte";
     import DotsSeparator from "./DotsSeparator.svelte";
     import Button from "../../Components/Button.svelte";
-    import {endPointStore, startPointStore} from "../../stores/userInput";
+    import {carProfileStore, endPointStore, startPointStore} from "../../stores/userInput";
     import {chargingStops} from "../../stores/routesInfo";
     import {openedScreen} from "../../stores/appState";
 
     import ChargingStopsButton from "./ChargingStopsButton.svelte";
     import {getContext} from "svelte";
     import MapPickerModal from "./MapPickerModal.svelte";
+    import CarSelectModal from "./CarSelectModal.svelte";
 
     const {open} = getContext('simple-modal');
 
@@ -50,8 +51,10 @@
     {$endPointStore.address}
 </MapPointSelectButton>
 
-<MapPointSelectButton>
-    Select car profile
+<MapPointSelectButton on:click={() => {
+       open(CarSelectModal, {}, {closeButton: true});
+}}>
+    {$carProfileStore.name}
 </MapPointSelectButton>
 
 {#if !$chargingStops}
