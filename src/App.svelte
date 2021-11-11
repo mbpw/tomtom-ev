@@ -12,7 +12,7 @@
     let result = 'nope';
     let distance = 0;
     let startPoint = [51.03994, 11.93770]
-    let endPoint = [50.10406, 8.62416]
+    let endPoint =   [52.39037, 13.37976]
     let routeOffer = undefined
     let routeLayerId = '0'
     let rg = new RouteGenerator();
