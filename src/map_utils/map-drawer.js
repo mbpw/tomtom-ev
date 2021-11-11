@@ -123,8 +123,7 @@ export class MapDrawer{
         markerElement.appendChild(markerContentElement);
         let iconElement = document.createElement('div');
         iconElement.className = 'marker-icon';
-        iconElement.style.backgroundImage  =
-            'url(https://api.tomtom.com/maps-sdk-for-web/cdn/static/' + icon + ')';
+        iconElement.innerHTML = "<img src='/public/icons/gps.svg'>"
         markerContentElement.appendChild(iconElement);
         // add marker to map
         return new tt.Marker({element: markerElement, anchor: 'bottom'})
@@ -142,10 +141,13 @@ export class MapDrawer{
             let i = 0
             for (const coordinate of coordinates) {
                 console.log(coordinate)
-                // let marker = this.createMarker('accident.colors-white.svg',"#d20c0c").setDraggable(false).setLngLat(coordinate)
-                let marker = new tt.Marker({
-                    color: "#43d20c",
-                }).setLngLat(coordinate).setDraggable(false)
+                let marker = this.createMarker('accident.colors-white.svg',"#d20c0c").setDraggable(false).setLngLat(coordinate)
+                // let markerElement = document.createElement('div');
+                // markerElement.innerHTML = "<img src='/public/icons/gps.svg' style='offset: 100px'>";
+                // let marker = new tt.Marker({element: markerElement,
+                //     color: "#43d20c", offsetTop: 300, offsetHeight:300
+                // }).setLngLat(coordinate).setDraggable(false)
+                // marker.getElement().innerHTML = "<img src='/public/icons/gps.svg'>";
                 console.log(marker)
                 marker.addTo(map)
                 if(stationInfo!==undefined) {
@@ -234,7 +236,7 @@ export class MapDrawer{
                 }).setLngLat(poi.position).setDraggable(false)
 
                 marker.addTo(map)
-                let popup = new tt.Popup({offset:40}).setHTML(`<b>${this.prettifyCodeName(poi.poi.classifications[0].code)}</b><br/>Name: ${poi.poi.name}<br />${poi.poi.phone!==undefined?"Phone: "+poi.poi.phone:'<br />'}
+                let popup = new tt.Popup({offset:40}).setHTML(`<b>${this.prettifyCodeName(poi.poi.classifications[0].code)}</b><br/>Name: ${poi.poi.name}<br />${poi.poi.phone!==undefined?"Phone: "+poi.poi.phone:''}<br />
 Distance from station: ${poi.route[0].summary.lengthInMeters}m<br />Travel time on foot: ${Math.round(poi.route[0].summary.travelTimeInSeconds/60)}min`);
                 marker.setPopup(popup)
                 poi.toggled = false
