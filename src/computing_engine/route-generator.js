@@ -85,10 +85,14 @@ export class RouteGenerator {
             this.computeOptimalRoute()
         }
         const points = []
+        let i = 0
         for (const leg of this.optimalRoute.routes[0].legs) {
-            points.push(...leg.points)
+            if(i++ % 20 === 0){
+                points.push(...leg.points)
+            }
         }
-        let sample = this.getRandomSubarray(points,100)
+        // let sample = this.getRandomSubarray(points,100)
+        let sample = points
         return sample
     }
 
@@ -126,10 +130,14 @@ export class RouteGenerator {
             const index = this.evStations.indexOf(station)
             this.evStations[index].visited = true
             const newStationLocation = [station.position.lat, station.position.lon]
+            console.log("First URL")
             const endpointURLFirst = this.getEndpointURL(this.startPoint[0], this.startPoint[1], newStationLocation[0], newStationLocation[1], this.currentChargeInkWh)
+            console.log(endpointURLFirst)
             let body = {json: this.carParams}
             let optimalRouteFirst = await this.makeOptimalRouteApiCall(endpointURLFirst, body)
+            console.log("Second URL")
             const endpointURLSecond = this.getEndpointURL(newStationLocation[0], newStationLocation[1], this.endPoint[0], this.endPoint[1], this.minChargeAtChargingStopsInkWh)
+            console.log(endpointURLSecond)
             let optimalRouteSecond = await this.makeOptimalRouteApiCall(endpointURLSecond, body)
             this.optimalRoute = optimalRouteFirst
             this.optimalRoute.routes[0].summary.lengthInMeters += optimalRouteSecond.routes[0].summary.lengthInMeters
@@ -175,7 +183,7 @@ export class RouteGenerator {
 
         console.log("Replacing legs and searching for EV stations again...")
         es.replaceRouteLegs(pts)
-        // this.pause(50)
+        // this.pause(100)
         let stations2 = await es.computeEVs()
         // console.log(stations2.results)
         for (const station of stations2.results) {
@@ -202,7 +210,7 @@ export class RouteGenerator {
             let categories_count = {}
             for (let poi of p) {
                 let category_id = poi.poi.categorySet[0].id.toString()
-                console.log(category_id)
+                // console.log(category_id)
                 if (category_id in categories_count) {
                     categories_count[category_id]++
                 } else {
@@ -210,7 +218,7 @@ export class RouteGenerator {
                 }
             }
             ev_stations.results[k1].pois_summary = categories_count
-            console.log(categories_count)
+            // console.log(categories_count)
             k1++
         }
 
@@ -277,12 +285,12 @@ export class RouteGenerator {
             index = station.pois.indexOf(POI)
         }
 
-        console.log(this.evStations)
-        console.log(station)
-        console.log(POI)
-        console.log("TUUUTEJ!!!!!!")
+        // console.log(this.evStations)
+        // console.log(station)
+        // console.log(POI)
+        // console.log("TUUUTEJ!!!!!!")
 
-        console.log(index)
+        // console.log(index)
         if (index !== -1) {
 
             station.pois[index].visited = true
