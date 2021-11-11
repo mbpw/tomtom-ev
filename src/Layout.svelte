@@ -2,6 +2,7 @@
     import {fly} from 'svelte/transition';
 
     import Destination from "./AppScreens/Desitnation/Destination.svelte";
+    import Start from "./AppScreens/Start/Start.svelte";
     import {openedScreen} from "./stores/appState";
     import Stops from "./AppScreens/Stops/Stops.svelte";
     import {Modal} from "svelte-simple-modal";
@@ -12,6 +13,11 @@
 </script>
 
 <Modal>
+    {#if $openedScreen === 0}
+        <div in:fly={flyInOptions} out:fly={flyOutOptions}>
+            <Start />
+        </div>
+    {/if}
     {#if $openedScreen === 1}
         <div in:fly={flyInOptions} out:fly={flyOutOptions}>
             <Destination/>
@@ -29,6 +35,7 @@
             <Tinder />
         </div>
     {/if}
+
 </Modal>
 
 <style>
