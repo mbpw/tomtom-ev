@@ -106,18 +106,20 @@
             ev_stations.results[k1].pois = p
 
             // Summary for pois
-            let categories_count = {}
-            for (let poi of p) {
-                let category_id = poi.poi.categorySet[0].id.toString()
-                console.log(category_id)
-                if (category_id in categories_count) {
-                    categories_count[category_id]++
-                } else {
-                    categories_count[category_id] = 1
+            if (p !== undefined) {
+                let categories_count = {}
+                for (let poi of p) {
+                    let category_id = poi.poi.categorySet[0].id.toString()
+                    console.log(category_id)
+                    if (category_id in categories_count) {
+                        categories_count[category_id]++
+                    } else {
+                        categories_count[category_id] = 1
+                    }
                 }
+                ev_stations.results[k1].pois_summary = categories_count
+                // console.log(categories_count)
             }
-            ev_stations.results[k1].pois_summary = categories_count
-            console.log(categories_count)
             k1++
         }
 
