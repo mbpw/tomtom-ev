@@ -1,5 +1,7 @@
 import {globalMap} from "../store";
+import {categories} from "../AppScreens/Stops/categories";
 import tt from "@tomtom-international/web-sdk-maps";
+import {element} from "svelte/internal";
 
 export class MapDrawer{
     constructor() {
@@ -114,12 +116,12 @@ export class MapDrawer{
         }
     }
 
-    createMarker(icon, color) { //Not Working
+    createMarker(icon, color = '#ffffff') { //Not Working
         let markerElement = document.createElement('div');
         markerElement.className = 'marker';
         let markerContentElement = document.createElement('div');
-        markerContentElement.className = 'marker-content';
-        markerContentElement.style.backgroundColor = color;
+        // markerContentElement.className = 'marker-content';
+        // markerContentElement.style.backgroundColor = color;
         markerElement.appendChild(markerContentElement);
         let iconElement = document.createElement('div');
         iconElement.className = 'marker-icon';
@@ -222,6 +224,15 @@ export class MapDrawer{
             return map
         })}
 
+    findCategoryIcon(categoryId){
+        for(let category of categories){
+            let any_category = category.options.find(element => element.name === 'Any')
+            let ids = any_category.category_id.split(',').map(Number)
+            if(ids.includes(categoryId))
+                return category.icon
+        }
+    }
+
     drawPoisOnMap(pois, removePrevious = true){
         if (removePrevious){
             for (const poi of this.Pois){
@@ -231,10 +242,12 @@ export class MapDrawer{
         }
         globalMap.update(map => {
             for (const poi of pois) {
-                let marker = new tt.Marker({
-                    color: "#186bbd"
-                }).setLngLat(poi.position).setDraggable(false)
-
+                // let marker = new tt.Marker({
+                //     color: "#186bbd"
+                // }).setLngLat(poi.position).setDraggable(false)
+                let poiCategoryId = poi.poi.categorySet[0].id
+                let categoryIcon = this.findCategoryIcon(poiCategoryId)
+                let marker =this.createMarker(categoryIcon).setLngLat(poi.position).setDraggable(false)
                 marker.addTo(map)
                 let popup = new tt.Popup({offset:40}).setHTML(`<b>${this.prettifyCodeName(poi.poi.classifications[0].code)}</b><br/>Name: ${poi.poi.name}<br />${poi.poi.phone!==undefined?"Phone: "+poi.poi.phone:''}<br />
 Distance from station: ${poi.route[0].summary.lengthInMeters}m<br />Travel time on foot: ${Math.round(poi.route[0].summary.travelTimeInSeconds/60)}min`);
