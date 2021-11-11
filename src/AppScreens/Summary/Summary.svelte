@@ -3,10 +3,23 @@
     import Map from "../../Components/Map.svelte";
     import {routesStore, selectedRouteIndex} from "../../stores/routesInfo";
     import {openedScreen} from "../../stores/appState";
-
+    import {globalMap} from "../../store";
+    import { onMount } from "svelte";
+    import {RG} from "../../computing_engine/route-generator";
+    import {MD} from "../../map_utils/map-drawer";
+    import tt from "@tomtom-international/web-sdk-maps";
     import Button from "../../Components/Button.svelte";
 
     $: route = $routesStore[$selectedRouteIndex];
+
+    // $globalMap.on('load',function() {
+    //     console.log(route)
+    //     let routeToDraw = RG.offeredRoutes[$selectedRouteIndex]
+    //     MD.drawWholeRouteOnMap((routeToDraw))
+    // })
+
+
+
 </script>
 <div class="parent">
     <Header>

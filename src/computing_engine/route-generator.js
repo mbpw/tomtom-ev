@@ -345,6 +345,7 @@ export class RouteGenerator {
                     } else {
                         stopDescription.name = "Reading time!"
                     }
+                    stopDescription.position = leg.points.at(-1)
                     stopDescription.arrivalTime = leg.summary.arrivalTime
                     routeDict.stops.push(stopDescription)
                     stopDescription.legNum = i
