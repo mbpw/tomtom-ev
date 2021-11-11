@@ -271,7 +271,11 @@ Distance from station: ${poi.route[0].summary.lengthInMeters}m<br />Travel time 
         for (const marker of this.EVStations) {
             marker.remove()
         }
+        for (const poi of this.Pois) {
+            poi.marker.remove()
+        }
         this.EVStations = []
+        this.Pois = []
         globalMap.update(map => {
             console.log(map)
             if (this.routeLayerId!=='0') {
