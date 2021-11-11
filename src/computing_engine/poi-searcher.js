@@ -120,6 +120,8 @@ export class POISearcher {
             json: {"batchItems": batchItems}
         }
         // console.log(JSON.stringify(post))
-        return await this.makeApiPostCall(url, body)
+        let found = await this.makeApiPostCall(url, body)
+        // for(let poi of found)
+        return found
     }
 }

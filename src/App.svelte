@@ -100,9 +100,24 @@
         console.log("Batch search POIs...")
         let pois1 = await ps.searchBatchPois(ev_stations.results)
         let k1 = 0
-        for (let poi of pois1.batchItems) {
-            ev_stations.results[k1].pois = poi.response.results
-            // ev_stations.results[k1].visited = false
+
+        for (let poi_list of pois1.batchItems) {
+            let p = poi_list.response.results
+            ev_stations.results[k1].pois = p
+
+            // Summary for pois
+            let categories_count = {}
+            for (let poi of p) {
+                let category_id = poi.poi.categorySet[0].id.toString()
+                console.log(category_id)
+                if (category_id in categories_count) {
+                    categories_count[category_id]++
+                } else {
+                    categories_count[category_id] = 1
+                }
+            }
+            ev_stations.results[k1].pois_summary = categories_count
+            console.log(categories_count)
             k1++
         }
 
@@ -239,7 +254,6 @@
     }
 
 
-
 </script>
 {#if kamil}
     <main>
@@ -248,7 +262,7 @@
         </button>
 
         <h1>Hello world!!!</h1>
-        <p>From <input bind:value={startPoint} /> to <input bind:value={endPoint} name="" /></p>
+        <p>From <input bind:value={startPoint}/> to <input bind:value={endPoint} name=""/></p>
         <p>
             <button on:click={zoom_to_popup}>
                 Zoom to POI popup
