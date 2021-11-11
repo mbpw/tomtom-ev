@@ -123,7 +123,7 @@ export class MapDrawer{
         markerElement.appendChild(markerContentElement);
         let iconElement = document.createElement('div');
         iconElement.className = 'marker-icon';
-        iconElement.innerHTML = "<img src=icon>"
+        iconElement.innerHTML = `<img src=${icon}>`
         markerContentElement.appendChild(iconElement);
         // add marker to map
         return new tt.Marker({element: markerElement, anchor: 'bottom'})

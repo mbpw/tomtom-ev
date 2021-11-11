@@ -31,6 +31,7 @@ export class RouteGenerator {
         this.optimalRouteTravelTime = 0
         this.actualRouteTravelTime = 0
         this.offeredRoutes = []
+        this.preferences = []
         this.carParams = {}
     }
 
@@ -115,7 +116,7 @@ export class RouteGenerator {
         }
     }
 
-    async generateStationsObject(start_point, end_point, categories){
+    async generateStationsObject(start_point, end_point){
         this.startPoint = [start_point.lat,start_point.lng]
         this.endPoint = [end_point.lat,end_point.lng]
         let es = new EVSearcher(this.startPoint, this.endPoint);
@@ -203,15 +204,16 @@ export class RouteGenerator {
     async prepareRouteOffer(ev_stations) {
         await this.getNextRoute()
         const POIsOnRoute = []
+        let iter = 0
         for (const leg of this.optimalRoute.routes[0].legs) {
             if (leg.summary.chargingInformationAtEndOfLeg !== undefined) {
                 const postalCode = leg.summary.chargingInformationAtEndOfLeg.chargingParkLocation.postalCode
                 const station = this.evStations.find(element => element.address.postalCode === postalCode);
-
                 if (station !== undefined) {
                     if (station.pois.length > 0) {
-                        const proposedPOI = await this.selectPOINearStation(station)
+                        const proposedPOI = await this.selectPOINearStation(station,iter)
                         leg.proposedPoi = proposedPOI
+                        iter++
                     }
                 }
             }
@@ -219,8 +221,8 @@ export class RouteGenerator {
         return this.optimalRoute
     }
 
-    async selectPOINearStation(station) { //POI selection from given station later
-        const POI = station.pois.find(element => element.visited === false);
+    async selectPOINearStation(station,num_station) { //POI selection from given station later
+        const POI = station.pois.find(element => element.visited === false && this.preferences[num_station].category_id.includes(element.poi.categorySet[0].id));
         console.log(this.evStations)
         console.log(station)
         console.log(POI)
@@ -297,9 +299,20 @@ export class RouteGenerator {
         return infoSummary
     }
 
-    async computeAllRouteOffers(numOffers = 3){
-        let routes = []
+    parsePreferences(preferences){
+        for (let preference of preferences){
+            preference.category_id = preference.category_id.split(',').map(Number)
+            // if(preference.category_id.includes(',')){
+            //     preference.category_id = preference.category_id
+            // }
+        }
+        return preferences
+    }
 
+    async computeAllRouteOffers(numOffers = 3, preferences){
+        let routes = []
+        this.preferences = this.parsePreferences(preferences)
+        console.log(this.preferences)
         await this.markPoisAsNotVisited()
         for(let i = 0; i < numOffers; i++){
             routes.push(await this.prepareRouteOffer())
