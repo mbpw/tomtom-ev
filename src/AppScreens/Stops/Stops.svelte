@@ -16,7 +16,7 @@
 
     import {RG} from "../../computing_engine/route-generator";
     import {MD} from "../../map_utils/map-drawer";
-    import {all_categories_ids} from "./categories";
+    import {randomize_ids} from "./categories";
 
     const {open} = getContext('simple-modal');
 
@@ -26,7 +26,7 @@
             name: 'Randomize',
             option: 'Randomize',
             icon: '',
-            category_id: all_categories_ids
+            category_id: randomize_ids
         })
     }
 

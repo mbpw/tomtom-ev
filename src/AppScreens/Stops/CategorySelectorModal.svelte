@@ -1,7 +1,7 @@
 <script>
     import Header from "../../Components/Header.svelte";
     import CircledIcon from "./CircledIcon.svelte";
-    import {all_categories_ids, categories} from "./categories";
+    import {randomize_ids, categories} from "./categories";
     import OptionButton from "./OptionButton.svelte";
     import {getContext} from "svelte";
     import {stopsPreferences} from "../../stores/userInput";
@@ -35,7 +35,7 @@
         <CircledIcon on:click={() => {
             $stopsPreferences[slot].name = 'Randomize';
             $stopsPreferences[slot].option = 'Randomize';
-            $stopsPreferences[slot].category_id = all_categories_ids;
+            $stopsPreferences[slot].category_id = randomize_ids;
             $stopsPreferences[slot].icon = './icons/dice.svg';
             close();
         }}>
