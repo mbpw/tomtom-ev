@@ -143,7 +143,7 @@ export class MapDrawer{
             let i = 0
             for (const coordinate of coordinates) {
                 console.log(coordinate)
-                let marker = this.createMarker('/public/icons/gps.svg',"#d20c0c").setDraggable(false).setLngLat(coordinate)
+                let marker = this.createMarker('/public/mapIcons/station.svg',"#d20c0c").setDraggable(false).setLngLat(coordinate)
                 // let markerElement = document.createElement('div');
                 // markerElement.innerHTML = "<img src='/public/icons/gps.svg' style='offset: 100px'>";
                 // let marker = new tt.Marker({element: markerElement,
@@ -247,6 +247,7 @@ export class MapDrawer{
                 // }).setLngLat(poi.position).setDraggable(false)
                 let poiCategoryId = poi.poi.categorySet[0].id
                 let categoryIcon = this.findCategoryIcon(poiCategoryId)
+                categoryIcon = categoryIcon.replace('icons','mapIcons')
                 let marker =this.createMarker(categoryIcon).setLngLat(poi.position).setDraggable(false)
                 marker.addTo(map)
                 let popup = new tt.Popup({offset:40}).setHTML(`<b>${this.prettifyCodeName(poi.poi.classifications[0].code)}</b><br/>Name: ${poi.poi.name}<br />${poi.poi.phone!==undefined?"Phone: "+poi.poi.phone:''}<br />
@@ -266,14 +267,16 @@ Distance from station: ${poi.route[0].summary.lengthInMeters}m<br />Travel time 
         }
         globalMap.update(map => {
 
-            this.startPoint = new tt.Marker({
-                color: "#000000"
-            }).setLngLat(startCoordinates).setDraggable(false)
+            // this.startPoint = new tt.Marker({
+            //     color: "#000000"
+            // }).setLngLat(startCoordinates).setDraggable(false)
+            this.startPoint = this.createMarker('/public/mapIcons/start.svg',"#d20c0c").setDraggable(false).setLngLat(startCoordinates)
             this.startPoint.addTo(map)
 
-            this.endPoint = new tt.Marker({
-                color: "#ffffff"
-            }).setLngLat(stopCoordinates).setDraggable(false)
+            // this.endPoint = new tt.Marker({
+            //     color: "#ffffff"
+            // }).setLngLat(stopCoordinates).setDraggable(false)
+            this.endPoint = this.createMarker('/public/mapIcons/end.svg',"#d20c0c").setDraggable(false).setLngLat(stopCoordinates)
             this.endPoint.addTo(map)
 
             return map
