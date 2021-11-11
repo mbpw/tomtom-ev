@@ -1,6 +1,6 @@
 # Charge&Go
 
-[logo]
+[](logo.png)
 
 ## Description:
 EV User! Are you fed up with waiting for your car to charge during your business travels or weekend trips?
